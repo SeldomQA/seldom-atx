@@ -1,2 +1,2 @@
 # seldom-atx
-seldom and openatx
+seldom and openatx complete mobile automation test.
