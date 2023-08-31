@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "seldom-atx"
+name = "seldom"
 version = "0.1.0"
-description = "seldom and openatx complete mobile automation test."
+description = "Seldom and Openatx complete mobile automation test."
 authors = ["bugmaster <fnngj@126.com>"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -47,7 +47,6 @@ matplotlib= "3.7.1"
 gevent = "23.7.0"
 pandas = "2.0.3"
 xlsxwriter = "3.1.2"
-tidevice = "0.11.0"
 
 [tool.poetry.scripts]
 seldom = "seldom.cli:main"
