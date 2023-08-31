@@ -13,9 +13,6 @@ from typing import Dict, List, Any
 from XTestRunner import HTMLTestRunner
 from XTestRunner import XMLTestRunner
 from seldom.testdata import get_now_datetime
-from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
-from selenium.common.exceptions import InvalidSessionIdException
-from seldom.driver import Browser
 from seldom.logging import log
 from seldom.logging import log_cfg
 from seldom.logging.exceptions import SeldomException
@@ -34,7 +31,7 @@ SELDOM_STR = f"""
    ________  / /___/ /___  ____ ____ 
   / ___/ _ \/ / __  / __ \/ __ ` ___/
  (__  )  __/ / /_/ / /_/ / / / / / /
-/____/\___/_/\__,_/\____/_/ /_/ /_/  v{VERSION}
+/____/\___/_/\__,_/\____/_/ /_/ /_/ + openatx v{VERSION}
 -----------------------------------------
                              @itest.info
 """
@@ -50,8 +47,6 @@ class TestMain:
             self,
             path: str = None,
             case: str = None,
-            browser: [str or dict] = None,
-            base_url: str = None,
             debug: bool = False,
             timeout: int = 10,
             app_server=None,
@@ -70,8 +65,6 @@ class TestMain:
         runner test case
         :param path:
         :param case:
-        :param browser:
-        :param base_url:
         :param title:
         :param tester:
         :param description:
@@ -91,7 +84,6 @@ class TestMain:
         print(SELDOM_STR)
         self.path = path
         self.case = case
-        self.browser = browser
         self.report = report
         self.title = BrowserConfig.REPORT_TITLE = title
         self.tester = tester
@@ -114,10 +106,7 @@ class TestMain:
 
         Seldom.timeout = timeout
         Seldom.debug = debug
-        Seldom.base_url = base_url
 
-        # ----- Global open browser -----
-        self.open_browser()
         if self.case is not None:
             self.TestSuits = seldomTestLoader.loadTestsFromName(self.case)
 
@@ -153,9 +142,6 @@ class TestMain:
 
         if self.auto is True:
             self.run(self.TestSuits)
-
-            # ----- Close browser globally -----
-            self.close_browser()
 
     def run(self, suits) -> None:
         """
@@ -205,34 +191,6 @@ class TestMain:
             runner.run(suits)
             log.success("A run the test in debug mode without generating HTML report!")
 
-    def open_browser(self) -> None:
-        """
-        If you set up a browser, open the browser
-        """
-        if self.browser is not None:
-            if isinstance(self.browser, str):
-                BrowserConfig.NAME = self.browser
-            elif isinstance(self.browser, dict):
-                BrowserConfig.NAME = self.browser.get("browser", None)
-                BrowserConfig.command_executor = self.browser.get("command_executor", "")
-                BrowserConfig.executable_path = self.browser.get("executable_path", "")
-                BrowserConfig.options = self.browser.get("options", None)
-            else:
-                raise TypeError("browser type error, str or dict.")
-            Seldom.driver = Browser(BrowserConfig.NAME)
-
-    @staticmethod
-    def close_browser() -> None:
-        """
-        How to open the browser, close the browser
-        """
-        if isinstance(Seldom.driver, SeleniumWebDriver):
-            try:
-                Seldom.driver.quit()
-            except InvalidSessionIdException:
-                ...
-            Seldom.driver = None
-
 
 class TestMainExtend(TestMain):
     """
@@ -244,8 +202,6 @@ class TestMainExtend(TestMain):
     def __init__(
             self,
             path: str = None,
-            browser: [str or dict] = None,
-            base_url: str = None,
             debug: bool = False,
             timeout: int = 10,
             app_server=None,
@@ -262,7 +218,7 @@ class TestMainExtend(TestMain):
         if path is None:
             raise FileNotFoundError("Specify a file path")
 
-        super().__init__(path=path, browser=browser, base_url=base_url, debug=debug, timeout=timeout,
+        super().__init__(path=path, debug=debug, timeout=timeout,
                          app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
                          description=description, rerun=rerun, language=language,
                          whitelist=whitelist, blacklist=blacklist, open=False, auto=False)
@@ -395,7 +351,6 @@ class TestMainExtend(TestMain):
                             suit.addTest(case)
 
         self.run(suit)
-        self.close_browser()
 
 
 main = TestMain

@@ -6,11 +6,11 @@ authors = ["bugmaster <fnngj@126.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 
-homepage = "https://seldomqa.github.io"
+homepage = "https://github.com/SeldomQA/seldom-atx"
 repository = "https://github.com/SeldomQA/seldom-atx"
-documentation = "https://seldomqa.github.io"
+documentation = "https://github.com/SeldomQA/seldom-atx"
 
-keywords = ["sedom", "openatx", "requests"]
+keywords = ["sedom", "openatx", "app"]
 
 classifiers = [
     'Intended Audience :: Developers',
@@ -28,7 +28,6 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-Appium-Python-Client = "^2.11.0"
 XTestRunner = "^1.7.0"
 parameterized = "~0.8.1"
 loguru = "~0.6.0"
@@ -37,7 +36,6 @@ pyyaml = "^6.0"
 requests = "^2.22.0"
 jsonschema = "^4.10.0"
 jmespath = "^0.10.0"
-webdriver-manager = "~4.0.0"
 pymysql = "^1.0.0"
 genson = "~1.2.2"
 click = "^8.1.3"

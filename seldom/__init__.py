@@ -24,15 +24,13 @@ from .running.config import Seldom, AppConfig
 from .running.loader_extend import SeldomTestLoader
 from .running.runner import main, TestMainExtend
 from .utils.send_extend import SMTP, DingTalk
-from .webdriver_chaining import Steps
 
 from .skip import *
-from .driver import *
 from .testdata.parameterization import *
 
 
 __author__ = "bugmaster"
 
-__version__ = "3.2.3"
+__version__ = "0.1.0"
 
-__description__ = "WebUI/HTTP automation testing framework based on unittest."
+__description__ = "seldom and openatx complete mobile automation test."

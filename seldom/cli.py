@@ -14,10 +14,6 @@ from seldom.logging import log, log_cfg
 from seldom.utils import file
 from seldom.utils import cache
 from seldom.har2case.core import HarParser
-from webdriver_manager.firefox import GeckoDriverManager
-from webdriver_manager.microsoft import IEDriverManager
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
-from seldom.utils.webdriver_manager_extend import ChromeDriverManager
 from seldom.running.loader_hook import loader
 from seldom import __version__
 
@@ -37,9 +33,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
               help="Parse the level of use cases. Need the --path.")
 @click.option("-j", "--case-json", default=None, help="Test case files. Need the `--path`.")
 @click.option("-e", "--env", default=None, help="Set the Seldom run environment `Seldom.env`.")
-@click.option("-b", "--browser", default=None,
-              type=click.Choice(['chrome', 'firefox', 'ie', 'edge', 'safari']),
-              help="The browser that runs the Web UI automation tests. Need the `--path`.")
 @click.option("-u", "--base-url", default=None,
               help="The base-url that runs the HTTP automation tests. Need the `--path`.")
 @click.option("-d/-nd", "--debug/--no-debug", default=False, help="Debug mode. Need the `--path`.")
@@ -47,15 +40,12 @@ ssl._create_default_https_context = ssl._create_unverified_context
               help="The number of times a use case failed to run again. Need the `--path`.")
 @click.option("-r", "--report", default=None, help="Set the test report for output. Need the `--path`.")
 @click.option("-m", "--mod", help="Run tests modules, classes or even individual test methods from the command line.")
-@click.option("-i", "--install",
-              type=click.Choice(['chrome', 'firefox', 'ie', 'edge']),
-              help="Install the browser driver.")
 @click.option("-ll", "--log-level",
               type=click.Choice(['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR']),
               help="Set the log level.")
 @click.option("-h2c", "--har2case", help="HAR file converts an interface test case.")
-def main(project, clear_cache, path, collect, level, case_json, env, debug, browser, base_url, rerun, report, mod,
-         install, log_level, har2case):
+def main(project, clear_cache, path, collect, level, case_json, env, debug, rerun, report, mod,
+         log_level, har2case):
     """
     seldom CLI.
     """
@@ -71,8 +61,6 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, brow
         log_cfg.set_level(level=log_level)
 
     # check hook function(confrun.py)
-    browser = loader("browser") if loader("browser") is not None else browser
-    base_url = loader("base_url") if loader("base_url") is not None else base_url
     debug = loader("debug") if loader("debug") is not None else debug
     rerun = loader("rerun") if loader("rerun") is not None else rerun
     report = loader("report") if loader("report") is not None else report
@@ -125,7 +113,7 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, brow
                 case = json.load(json_file)
                 path, case = reset_case(path, case)
                 main_extend = TestMainExtend(
-                    path=path, browser=browser, base_url=base_url, debug=debug, timeout=timeout,
+                    path=path, debug=debug, timeout=timeout,
                     app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
                     description=description, rerun=rerun, language=language,
                     whitelist=whitelist, blacklist=blacklist)
@@ -135,7 +123,7 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, brow
 
         loader("start_run")
         seldom.main(
-            path=path, browser=browser, base_url=base_url, debug=debug, timeout=timeout,
+            path=path, debug=debug, timeout=timeout,
             app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
             description=description, rerun=rerun, language=language,
             whitelist=whitelist, blacklist=blacklist)
@@ -147,15 +135,11 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, brow
         sys.path.insert(0, file_dir)
         loader("start_run")
         seldom.main(
-            case=mod, browser=browser, base_url=base_url, debug=debug, timeout=timeout,
+            case=mod, debug=debug, timeout=timeout,
             app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
             description=description, rerun=rerun, language=language,
             whitelist=whitelist, blacklist=blacklist)
         loader("end_run")
-        return 0
-
-    if install:
-        install_driver(install)
         return 0
 
     if har2case:
@@ -220,55 +204,10 @@ if __name__ == '__main__':
     seldom.main(debug=True)
 
 '''
-    test_api_sample = '''import seldom
-
-
-class TestRequest(seldom.TestCase):
-    """api test case"""
-
-    def test_put_method(self):
-        self.put('/put', data={'key': 'value'})
-        self.assertStatusCode(200)
-
-    def test_post_method(self):
-        self.post('/post', data={'key':'value'})
-        self.assertStatusCode(200)
-
-    def test_get_method(self):
-        payload = {'key1': 'value1', 'key2': 'value2'}
-        self.get('/get', params=payload)
-        self.assertStatusCode(200)
-
-    def test_delete_method(self):
-        self.delete('/delete')
-        self.assertStatusCode(200)
-
-
-if __name__ == '__main__':
-    seldom.main(base_url="http://httpbin.org")
-
-    '''
 
     run_test = '''"""
 seldom confrun.py hooks function
 """
-
-
-def browser():
-    """
-    web UI test:
-    browser: gc(google chrome)/ff(firefox)/edge/ie/safari
-    """
-    return "gc"
-
-
-def base_url():
-    """
-    http test
-    api base url
-    """
-    return "http://httpbin.org"
-
 
 def debug():
     """
@@ -347,32 +286,7 @@ def blacklist():
     create_file(os.path.join(project_name, "test_data", "data.json"), test_data)
     create_file(os.path.join(project_name, "test_dir", "__init__.py"))
     create_file(os.path.join(project_name, "test_dir", "test_web_sample.py"), test_web_sample)
-    create_file(os.path.join(project_name, "test_dir", "test_api_sample.py"), test_api_sample)
     create_file(os.path.join(project_name, "confrun.py"), run_test)
-
-
-def install_driver(browser: str) -> None:
-    """
-    Download and install the browser driver
-
-    :param browser: The Driver to download. Pass as `chrome/firefox/ie/edge`. Default Chrome.
-    :return:
-    """
-
-    if browser == "chrome":
-        driver_path = ChromeDriverManager().install()
-        log.info(f"Chrome Driver[==>] {driver_path}")
-    elif browser == "firefox":
-        driver_path = GeckoDriverManager().install()
-        log.info(f"Firefox Driver[==>] {driver_path}")
-    elif browser == "ie":
-        driver_path = IEDriverManager().install()
-        log.info(f"IE Driver[==>] {driver_path}")
-    elif browser == "edge":
-        driver_path = EdgeChromiumDriverManager().install()
-        log.info(f"Edge Driver[==>] {driver_path}")
-    else:
-        raise NameError(f"Not found '{browser}' browser driver.")
 
 
 def reset_case(path: str, cases: list) -> [str, list]:

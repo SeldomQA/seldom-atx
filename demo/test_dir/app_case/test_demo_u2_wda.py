@@ -19,7 +19,7 @@ class TestDemo(seldom.TestCase):
         test flyme bbs search
         """
         # self.sleep(5)
-        self.launch_app_wda()
+        self.launch_app_u2()
         start_recording()
         self.sleep(3)
         self.click_wda(elem=Element.edit, index=0)
