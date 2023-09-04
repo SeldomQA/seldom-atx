@@ -40,7 +40,7 @@ class MySoloX:
         if platform == Seldom.app_info.get('platformName'):
             wait_times = 0
             while wait_times <= 20:
-                if u2.wait_app_u2() != 0:
+                if u2.wait_app() != 0:
                     break
                 wait_times += 1
                 log.info(f'Unable to obtain pid,retry...{wait_times}')
@@ -348,7 +348,7 @@ def run_testcase(func, *args, **kwargs):
         raise e
     if Common.record and (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
         time.sleep(1)
-        u2.stop_recording_u2()
+        u2.stop_recording()
     elif Common.record and (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'iOS'):
         Common.record = False
         if Common.iOS_perf_obj is not None:
@@ -364,7 +364,7 @@ def get_log(log_path, run_path):
         while not os.path.exists(run_path):
             time.sleep(1)
         if (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
-            u2.write_log_u2(log_path)
+            u2.write_log(log_path)
     except Exception as e:
         Common.LOGS_ERROR.append(f"{e}")
         log.error(f'Error in get_log: {e}')
@@ -403,7 +403,7 @@ def start_record(video_path, run_path):
                         while Common.record:
                             time.sleep(1)
                 elif (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
-                    u2.start_recording_u2(video_path)
+                    u2.start_recording(video_path)
             except Exception as e:
                 Common.RECORD_ERROR.append(f"{e}")
                 log.error(f"Error in start_record: {e}")
@@ -519,9 +519,9 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                     stop_frame_list.append(Common.image_to_base64(stop_frame_path))
                     if run_times != 1:
                         if (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
-                            u2.launch_app_u2(stop=True)
+                            u2.launch_app(stop=True)
                         elif (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'iOS'):
-                            wda_.launch_app_wda(stop=True)
+                            wda_.launch_app(stop=True)
 
                 # --------------------------Performance image saved locally and converted to base64--------------------
                 if MODE in [RunType.DURATION, RunType.STRESS] and Common.PERF_ERROR == []:

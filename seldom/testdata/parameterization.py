@@ -24,7 +24,7 @@ from seldom import Seldom
 
 
 __all__ = [
-    "file_data", "api_data", "data", "data_class"
+    "file_data", "data", "data_class"
 ]
 
 
@@ -174,33 +174,33 @@ def file_data(file: str, line: int = 1, sheet: str = "Sheet1", key: str = None, 
     return data(data_list)
 
 
-def api_data(url: str = None, params: dict = None, headers: dict = None, ret: str = None):
-    """
-    Support api data parameterization.
-    :param url:
-    :param params:
-    :param headers:
-    :param ret:
-    :return:
-    """
-
-    if url is None and Seldom.api_data_url is None:
-        raise ValueError("url is not None")
-
-    url = url if url is not None else Seldom.api_data_url
-    resp = requests.get(url, params=params, headers=headers).json()
-
-    if ret is not None:
-        data_ = utils_jmespath(resp, ret)
-        if data_ is None:
-            raise ValueError(f"Error - return {ret} is None in {resp}")
-        if isinstance(data_, list) is False:
-            raise TypeError(f"Error - {data_} is not list")
-        return data(data_)
-
-    if isinstance(resp, list) is False:
-        raise TypeError(f"Error - {resp} is not list")
-    return data(resp)
+# def api_data(url: str = None, params: dict = None, headers: dict = None, ret: str = None):
+#     """
+#     Support api data parameterization.
+#     :param url:
+#     :param params:
+#     :param headers:
+#     :param ret:
+#     :return:
+#     """
+#
+#     if url is None and Seldom.api_data_url is None:
+#         raise ValueError("url is not None")
+#
+#     url = url if url is not None else Seldom.api_data_url
+#     resp = requests.get(url, params=params, headers=headers).json()
+#
+#     if ret is not None:
+#         data_ = utils_jmespath(resp, ret)
+#         if data_ is None:
+#             raise ValueError(f"Error - return {ret} is None in {resp}")
+#         if isinstance(data_, list) is False:
+#             raise TypeError(f"Error - {data_} is not list")
+#         return data(data_)
+#
+#     if isinstance(resp, list) is False:
+#         raise TypeError(f"Error - {resp} is not list")
+#     return data(resp)
 
 
 def data(input, name_func=None, doc_func=None, skip_on_empty=False, **legacy):

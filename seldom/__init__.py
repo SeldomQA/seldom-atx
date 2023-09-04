@@ -19,7 +19,7 @@
 from gevent import monkey  # 引入协程的monkey库
 
 monkey.patch_all()  # 统一修改全局协程等待的耗时为协程的耗时
-from .case import TestCase
+from .case import TestCaseU2, TestCaseWDA
 from .running.config import Seldom, AppConfig
 from .running.loader_extend import SeldomTestLoader
 from .running.runner import main, TestMainExtend
@@ -27,7 +27,6 @@ from .utils.send_extend import SMTP, DingTalk
 
 from .skip import *
 from .testdata.parameterization import *
-
 
 __author__ = "bugmaster"
 
