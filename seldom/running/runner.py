@@ -49,8 +49,9 @@ class TestMain:
             case: str = None,
             debug: bool = False,
             timeout: int = 10,
-            app_server=None,
-            app_info=None,
+            deviceId: str = None,
+            platformName: str = None,
+            appPackage: str = None,
             report: str = None,
             title: str = "Seldom Test Report",
             tester: str = "Anonymous",
@@ -70,8 +71,9 @@ class TestMain:
         :param description:
         :param debug:
         :param timeout:
-        :param app_server:
-        :param app_info:
+        :param deviceId:
+        :param platformName:
+        :param appPackage:
         :param report:
         :param rerun:
         :param language:
@@ -95,8 +97,9 @@ class TestMain:
         self.blacklist = blacklist
         self.open = open
         self.auto = auto
-        Seldom.app_server = app_server
-        Seldom.app_info = app_info
+        Seldom.platformName = platformName
+        Seldom.deviceId = deviceId
+        Seldom.appPackage = appPackage
 
         if isinstance(timeout, int) is False:
             raise TypeError(f"Timeout {timeout} is not integer.")
@@ -204,8 +207,9 @@ class TestMainExtend(TestMain):
             path: str = None,
             debug: bool = False,
             timeout: int = 10,
-            app_server=None,
-            app_info=None,
+            deviceId: str = None,
+            platformName: str = None,
+            appPackage: str = None,
             report: str = None,
             title: str = "Seldom Test Report",
             tester: str = "Anonymous",
@@ -219,7 +223,8 @@ class TestMainExtend(TestMain):
             raise FileNotFoundError("Specify a file path")
 
         super().__init__(path=path, debug=debug, timeout=timeout,
-                         app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
+                         deviceId=deviceId, platformName=platformName, appPackage=appPackage, report=report,
+                         title=title, tester=tester,
                          description=description, rerun=rerun, language=language,
                          whitelist=whitelist, blacklist=blacklist, open=False, auto=False)
 

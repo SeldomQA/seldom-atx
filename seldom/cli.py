@@ -65,8 +65,9 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
     rerun = loader("rerun") if loader("rerun") is not None else rerun
     report = loader("report") if loader("report") is not None else report
     timeout = loader("timeout") if loader("timeout") is not None else 10
-    app_server = loader("app_server") if loader("app_server") is not None else None
-    app_info = loader("app_info") if loader("app_info") is not None else None
+    platformName = loader("platformName") if loader("platformName") is not None else None
+    appPackage = loader("appPackage") if loader("appPackage") is not None else None
+    deviceId = loader("deviceId") if loader("deviceId") is not None else None
     title = loader("title") if loader("title") is not None else "Seldom Test Report"
     tester = loader("tester") if loader("tester") is not None else "Anonymous"
     description = loader("description") if loader("description") is not None else "Test case execution"
@@ -114,7 +115,8 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
                 path, case = reset_case(path, case)
                 main_extend = TestMainExtend(
                     path=path, debug=debug, timeout=timeout,
-                    app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
+                    platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
+                    tester=tester,
                     description=description, rerun=rerun, language=language,
                     whitelist=whitelist, blacklist=blacklist)
                 main_extend.run_cases(case)
@@ -124,7 +126,8 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
         loader("start_run")
         seldom.main(
             path=path, debug=debug, timeout=timeout,
-            app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
+            platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
+            tester=tester,
             description=description, rerun=rerun, language=language,
             whitelist=whitelist, blacklist=blacklist)
         loader("end_run")
@@ -136,7 +139,8 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
         loader("start_run")
         seldom.main(
             case=mod, debug=debug, timeout=timeout,
-            app_server=app_server, app_info=app_info, report=report, title=title, tester=tester,
+            platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
+            tester=tester,
             description=description, rerun=rerun, language=language,
             whitelist=whitelist, blacklist=blacklist)
         loader("end_run")
@@ -309,7 +313,7 @@ def reset_case(path: str, cases: list) -> [str, list]:
     else:
         path = os.path.join(path, case_start)
         for case in cases:
-            case["file"] = case["file"][len(case_start)+1:]
+            case["file"] = case["file"][len(case_start) + 1:]
         return path, cases
 
     return path, cases

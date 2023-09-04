@@ -8,13 +8,12 @@ class Seldom:
     Seldom browser driver
     """
     driver = None
-    timeout = 10
+    timeout = 30
     debug = False
-    compare_url = None
-    app_server = None
-    app_info = None
+    platformName = None
+    deviceId = None
+    appPackage = None
     env = None
-    api_data_url = None
 
 
 class BrowserConfig:
@@ -34,7 +33,7 @@ class BrowserConfig:
 
 class AppConfig:
     """
-    Define run uiautomator2 and facebook-wda config
+    Define run atx config
     """
     PERF_OUTPUT_FOLDER = None
     PERF_RUN_FOLDER = None
