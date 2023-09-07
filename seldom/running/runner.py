@@ -9,16 +9,15 @@ import inspect
 import unittest
 import webbrowser
 from typing import Dict, List, Any
-
 from XTestRunner import HTMLTestRunner
 from XTestRunner import XMLTestRunner
-from seldom.testdata import get_now_datetime
 from seldom.logging import log
 from seldom.logging import log_cfg
 from seldom.logging.exceptions import SeldomException
 from seldom.running.DebugTestRunner import DebugTestRunner
 from seldom.running.config import Seldom, BrowserConfig, AppConfig
 from seldom.running.loader_extend import seldomTestLoader
+from seldom.testdata.conversion import write_to_excel
 
 INIT_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "__init__.py")
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
@@ -176,11 +175,14 @@ class TestMain:
                                             language=self.language, blacklist=self.blacklist, whitelist=self.whitelist)
                     runner.run(suits)
             if AppConfig.WRITE_EXCEL:
-                import pandas as pd
-                df = pd.DataFrame(AppConfig.WRITE_EXCEL)
-                with pd.ExcelWriter(os.path.join(report_folder, f'{get_now_datetime(strftime=True)}.xlsx'),
-                                    engine='xlsxwriter') as writer:
-                    df.to_excel(writer, sheet_name='Sheet1', index=False)
+                write_to_excel(data=AppConfig.WRITE_EXCEL,
+                               filename=os.path.join(report_folder, f'{os.path.basename(report_path)[:26]}.xlsx'))
+                # import pandas as pd
+                # df = pd.DataFrame(AppConfig.WRITE_EXCEL)
+                # with pd.ExcelWriter(
+                #         os.path.join(report_folder, f'{os.path.basename(report_path)[:26]}.xlsx'),
+                #         engine='xlsxwriter') as writer:
+                #     df.to_excel(writer, sheet_name='Sheet1', index=False)
 
             log.success(f"generated html file: file:///{report_path}")
             log.success(f"generated log file: file:///{BrowserConfig.LOG_PATH}")
