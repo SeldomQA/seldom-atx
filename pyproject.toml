@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "seldom"
+name = "seldom-atx"
 version = "0.1.0"
 description = "Seldom and Openatx complete mobile automation test."
 authors = ["bugmaster <fnngj@126.com>"]
