@@ -3,7 +3,7 @@ SQLite3 DB API
 """
 from typing import Any
 import sqlite3
-from seldom.db_operation.base_db import SQLBase
+from seldom_atx.db_operation.base_db import SQLBase
 
 
 class SQLiteDB(SQLBase):

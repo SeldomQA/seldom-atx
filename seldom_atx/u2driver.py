@@ -6,10 +6,10 @@ from datetime import datetime
 import os
 import time
 from typing import Tuple
-from seldom.testdata import get_word
-from seldom.logging import log
-from seldom.running.config import Seldom, AppConfig
-from seldom.logging.exceptions import NotFindElementError
+from seldom_atx.testdata import get_word
+from seldom_atx.logging import log
+from seldom_atx.running.config import Seldom, AppConfig
+from seldom_atx.logging.exceptions import NotFindElementError
 
 __all__ = ["U2Driver", "U2Element", "u2"]
 
@@ -476,7 +476,7 @@ class U2Driver:
     @staticmethod
     def app_info(package_name: str = None) -> str:
         if not package_name:
-            package_name = Seldom.app_info.get('appPackage')
+            package_name = Seldom.appPackage
         info = Seldom.driver.app_info(package_name)
         log.info(f'✅ {package_name} -> info: {info}.')
         return info

@@ -1,19 +1,19 @@
 """
-seldom test case
+seldom_atx test case
 """
 import time
 import wda
 import uiautomator2
 import unittest
-from seldom.u2driver import U2Driver
-from seldom.wdadriver import WDADriver
-from seldom.running.config import Seldom, AppConfig
-from seldom.logging import log
-from seldom.logging.exceptions import NotFindElementError
+from seldom_atx.u2driver import U2Driver
+from seldom_atx.wdadriver import WDADriver
+from seldom_atx.running.config import Seldom, AppConfig
+from seldom_atx.logging import log
+from seldom_atx.logging.exceptions import NotFindElementError
 
 
 class TestCase(unittest.TestCase):
-    """seldom TestCase class"""
+    """seldom_atx TestCase class"""
 
     def start_class(self):
         """

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "seldom-atx"
+name = "seldom_atx"
 version = "0.1.0"
 description = "Seldom and Openatx complete mobile automation test."
 authors = ["bugmaster <fnngj@126.com>"]
@@ -48,7 +48,7 @@ tidevice = "0.11.0"
 jinja2 = "3.1.2"
 
 [tool.poetry.scripts]
-seldom = "seldom.cli:main"
+seldom = "seldom_atx.cli:main"
 
 
 [build-system]

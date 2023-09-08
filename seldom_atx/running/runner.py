@@ -1,5 +1,5 @@
 """
-seldom main
+seldom_atx main
 """
 import os
 import re
@@ -11,13 +11,13 @@ import webbrowser
 from typing import Dict, List, Any
 from XTestRunner import HTMLTestRunner
 from XTestRunner import XMLTestRunner
-from seldom.logging import log
-from seldom.logging import log_cfg
-from seldom.logging.exceptions import SeldomException
-from seldom.running.DebugTestRunner import DebugTestRunner
-from seldom.running.config import Seldom, BrowserConfig, AppConfig
-from seldom.running.loader_extend import seldomTestLoader
-from seldom.testdata.conversion import write_to_excel
+from seldom_atx.logging import log
+from seldom_atx.logging import log_cfg
+from seldom_atx.logging.exceptions import SeldomException
+from seldom_atx.running.DebugTestRunner import DebugTestRunner
+from seldom_atx.running.config import Seldom, BrowserConfig, AppConfig
+from seldom_atx.running.loader_extend import seldomTestLoader
+from seldom_atx.testdata.conversion import write_to_excel
 
 INIT_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "__init__.py")
 _version_re = re.compile(r'__version__\s+=\s+(.*)')

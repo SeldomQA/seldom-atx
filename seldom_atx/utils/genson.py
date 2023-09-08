@@ -3,7 +3,7 @@ genson:
 https://github.com/wolverdude/GenSON
 """
 from genson import SchemaBuilder
-from seldom.request import ResponseResult
+from seldom_atx.request import ResponseResult
 
 
 def genson(data: dict = None):

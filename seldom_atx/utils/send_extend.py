@@ -6,8 +6,8 @@ from XTestRunner import SMTP as XSMTP
 from XTestRunner import DingTalk as XDingTalk
 from XTestRunner import FeiShu as XFeiShu
 from XTestRunner import Weinxin as XWeinxin
-from seldom.running.config import BrowserConfig
-from seldom.utils import file
+from seldom_atx.running.config import BrowserConfig
+from seldom_atx.utils import file
 
 
 class SMTP(XSMTP):
@@ -15,7 +15,7 @@ class SMTP(XSMTP):
 
     def sendmail(self, to: [str, list], subject: str = None, attachments: str = None, delete: bool = False) -> None:
         """
-        seldom send email
+        seldom_atx send email
         :param to:
         :param subject:
         :param attachments:

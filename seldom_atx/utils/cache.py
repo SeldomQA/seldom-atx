@@ -1,5 +1,5 @@
 """
-seldom cache
+seldom_atx cache
 """
 import os
 import sys
@@ -8,7 +8,7 @@ import uuid
 import pickle
 import shutil
 import tempfile
-from seldom.logging import log
+from seldom_atx.logging import log
 from functools import lru_cache
 from functools import wraps as func_wraps
 

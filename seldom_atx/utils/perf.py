@@ -16,8 +16,8 @@ import statistics
 import matplotlib
 import numpy as np
 from . import cache
-from seldom.logging import log
-from seldom.running.config import Seldom, AppConfig
+from seldom_atx.logging import log
+from seldom_atx.running.config import Seldom, AppConfig
 from ..u2driver import u2
 from ..wdadriver import wda_, make_screenrecord
 from matplotlib import pyplot as plt
@@ -34,10 +34,10 @@ class MySoloX:
 
     def __init__(self, pkgName, deviceId=None, platform=None):
         if deviceId is None:
-            deviceId = Seldom.app_info.get('deviceName')
+            deviceId = Seldom.deviceId
         if platform is None:
-            platform = Seldom.app_info.get('platformName')
-        if platform == Seldom.app_info.get('platformName'):
+            platform = Seldom.platformName
+        if platform == Seldom.platformName:
             wait_times = 0
             while wait_times <= 20:
                 if u2.wait_app() != 0:

@@ -2,8 +2,8 @@
 har to case core
 """
 import os
-from seldom.logging import log
-from seldom.har2case import utils
+from seldom_atx.logging import log
+from seldom_atx.har2case import utils
 
 
 class HarParser:
@@ -11,10 +11,10 @@ class HarParser:
 
     def __init__(self, har_file_path: str):
         self.har_file_path = har_file_path
-        self.case_template = """import seldom
+        self.case_template = """import seldom_atx
 
 
-class TestRequest(seldom.TestCase):
+class TestRequest(seldom_atx.TestCase):
 
     def start(self):
         self.url = "{url}"
@@ -27,7 +27,7 @@ class TestRequest(seldom.TestCase):
 
 
 if __name__ == '__main__':
-    seldom.main()
+    seldom_atx.main()
 """
 
     def _make_testcase(self) -> str:

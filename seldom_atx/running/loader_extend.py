@@ -1,4 +1,4 @@
-"""seldom Loading unittests."""
+"""seldom_atx Loading unittests."""
 import os
 import sys
 import functools

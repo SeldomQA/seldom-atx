@@ -4,7 +4,7 @@ har to case utils
 import io
 import sys
 import json
-from seldom.logging import log
+from seldom_atx.logging import log
 
 
 def load_har_log_entries(file_path):

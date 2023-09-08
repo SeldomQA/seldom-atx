@@ -8,9 +8,9 @@ import threading
 from datetime import datetime
 import imageio
 import tidevice
-from seldom.logging import log
-from seldom.logging.exceptions import NotFindElementError
-from seldom.running.config import Seldom, AppConfig
+from seldom_atx.logging import log
+from seldom_atx.logging.exceptions import NotFindElementError
+from seldom_atx.running.config import Seldom, AppConfig
 
 __all__ = ["WDADriver", "WDAElement", "make_screenrecord", "wda_"]
 

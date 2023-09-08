@@ -6,7 +6,7 @@ import sys
 import time
 import inspect
 from loguru import logger
-from seldom.running.config import BrowserConfig
+from seldom_atx.running.config import BrowserConfig
 
 stack_t = inspect.stack()
 ins = inspect.getframeinfo(stack_t[1][0])

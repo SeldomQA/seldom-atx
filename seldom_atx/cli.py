@@ -1,21 +1,21 @@
 """
-seldom CLI
+seldom_atx CLI
 """
 import os
 import sys
 import ssl
 import json
 import click
-import seldom
-from seldom import Seldom
-from seldom import SeldomTestLoader
-from seldom import TestMainExtend
-from seldom.logging import log, log_cfg
-from seldom.utils import file
-from seldom.utils import cache
-from seldom.har2case.core import HarParser
-from seldom.running.loader_hook import loader
-from seldom import __version__
+import seldom_atx
+from seldom_atx import Seldom
+from seldom_atx import SeldomTestLoader
+from seldom_atx import TestMainExtend
+from seldom_atx.logging import log, log_cfg
+from seldom_atx.utils import file
+from seldom_atx.utils import cache
+from seldom_atx.har2case.core import HarParser
+from seldom_atx.running.loader_hook import loader
+from seldom_atx import __version__
 
 PY3 = sys.version_info[0] == 3
 
@@ -25,7 +25,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 @click.command()
 @click.version_option(version=__version__, help="Show version.")
 @click.option("-P", "--project", help="Create an Seldom automation test project.")
-@click.option('-cc', "--clear-cache", default=False, help="Clear all caches of seldom.")
+@click.option('-cc', "--clear-cache", default=False, help="Clear all caches of seldom_atx.")
 @click.option("-p", "--path", help="Run test case file path.")
 @click.option("-c/-nc", "--collect/--no-collect", default=False, help="Collect project test cases. Need the `--path`.")
 @click.option("-l", "--level", default="data",
@@ -47,7 +47,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 def main(project, clear_cache, path, collect, level, case_json, env, debug, rerun, report, mod,
          log_level, har2case):
     """
-    seldom CLI.
+    seldom_atx CLI.
     """
 
     if project:
@@ -124,7 +124,7 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
             return 0
 
         loader("start_run")
-        seldom.main(
+        seldom_atx.main(
             path=path, debug=debug, timeout=timeout,
             platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
             tester=tester,
@@ -137,7 +137,7 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
         file_dir = os.getcwd()
         sys.path.insert(0, file_dir)
         loader("start_run")
-        seldom.main(
+        seldom_atx.main(
             case=mod, debug=debug, timeout=timeout,
             platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
             tester=tester,
@@ -175,18 +175,18 @@ def create_scaffold(project_name: str) -> None:
 
     test_data = '''{
  "bing":  [
-    ["case1", "seldom"],
+    ["case1", "seldom_atx"],
     ["case2", "poium"],
     ["case3", "XTestRunner"]
  ]
 }
 
 '''
-    test_web_sample = '''import seldom
-from seldom import file_data
+    test_web_sample = '''import seldom_atx
+from seldom_atx import file_data
 
 
-class SampleTest(seldom.TestCase):
+class SampleTest(seldom_atx.TestCase):
 
     def test_case(self):
         """a simple test case """
@@ -194,7 +194,7 @@ class SampleTest(seldom.TestCase):
         self.assertInUrl("itest.info")
 
 
-class DDTTest(seldom.TestCase):
+class DDTTest(seldom_atx.TestCase):
 
     @file_data(file="data.json", key="bing")
     def test_data_driver(self, _, keyword):
@@ -205,12 +205,12 @@ class DDTTest(seldom.TestCase):
 
 
 if __name__ == '__main__':
-    seldom.main(debug=True)
+    seldom_atx.main(debug=True)
 
 '''
 
     run_test = '''"""
-seldom confrun.py hooks function
+seldom_atx confrun.py hooks function
 """
 
 def debug():
@@ -248,7 +248,7 @@ def title():
     """
     setting report title
     """
-    return "seldom test report"
+    return "seldom_atx test report"
 
 
 def tester():

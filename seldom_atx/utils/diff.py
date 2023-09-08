@@ -2,7 +2,7 @@
 diff file
 """
 from typing import Any
-from seldom.logging import log
+from seldom_atx.logging import log
 
 
 class AssertInfo:

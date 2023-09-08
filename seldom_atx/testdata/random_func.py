@@ -10,7 +10,7 @@ import hashlib
 import datetime
 from dateutil.relativedelta import relativedelta
 
-from seldom.testdata.random_data import (
+from seldom_atx.testdata.random_data import (
     en_first_names_male,
     en_first_names_female,
     en_last_names,

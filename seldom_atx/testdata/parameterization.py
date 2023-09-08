@@ -16,11 +16,11 @@ from parameterized.parameterized import parameterized_argument_value_pairs
 from parameterized.parameterized import short_repr
 from parameterized.parameterized import to_text
 from parameterized import parameterized_class
-from seldom.testdata import conversion
-from seldom.logging.exceptions import FileTypeError
-from seldom.logging import log
-from seldom.utils import jmespath as utils_jmespath
-from seldom import Seldom
+from seldom_atx.testdata import conversion
+from seldom_atx.logging.exceptions import FileTypeError
+from seldom_atx.logging import log
+from seldom_atx.utils import jmespath as utils_jmespath
+from seldom_atx import Seldom
 
 
 __all__ = [

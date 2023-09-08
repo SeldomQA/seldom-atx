@@ -1,30 +1,32 @@
 """
-MySQL DB API
+MS SQL Server DB API
 """
 from typing import Any
-import pymysql.cursors
-from seldom.db_operation.base_db import SQLBase
+try:
+    import pymssql
+except ModuleNotFoundError as e:
+    raise ModuleNotFoundError("Please install the library. https://github.com/pymssql/pymssql")
+from seldom_atx.db_operation.base_db import SQLBase
 
 
-class MySQLDB(SQLBase):
-    """MySQL DB table API"""
+class MSSQLDB(SQLBase):
+    """SQL Server DB table API"""
 
-    def __init__(self, host: str, port: int, user: str, password: str, database: str, charset='utf8mb4'):
+    def __init__(self, server: str, user: str, password: str, database: str, charset="utf8mb4"):
         """
-        Connect to the MySQL database
-        :param host:
-        :param port:
+        Connect to the SQL Server database
+        :param server:
         :param user:
         :param password:
         :param database:
         """
-        self.connection = pymysql.connect(host=host,
-                                          port=int(port),
+        self.connection = pymssql.connect(server=server,
                                           user=user,
                                           password=password,
                                           database=database,
-                                          charset=charset,
-                                          cursorclass=pymysql.cursors.DictCursor)
+                                          charset=charset)
+
+        # self.cursor = self.connection.cursor(as_dict=True)
 
     def close(self) -> None:
         """
@@ -36,10 +38,8 @@ class MySQLDB(SQLBase):
         """
         Execute SQL
         """
+        print("running sql ", sql)
         with self.connection.cursor() as cursor:
-            self.connection.ping(reconnect=True)
-            if "delete" in sql.lower()[0:6]:
-                cursor.execute("SET FOREIGN_KEY_CHECKS=0;")
             cursor.execute(sql)
         self.connection.commit()
 
@@ -50,7 +50,6 @@ class MySQLDB(SQLBase):
         """
         data_list = []
         with self.connection.cursor() as cursor:
-            self.connection.ping(reconnect=True)
             cursor.execute(sql)
             rows = cursor.fetchall()
             for row in rows:
@@ -64,7 +63,6 @@ class MySQLDB(SQLBase):
         :return:
         """
         with self.connection.cursor() as cursor:
-            self.connection.ping(reconnect=True)
             cursor.execute(sql)
             row = cursor.fetchone()
             self.connection.commit()
@@ -77,7 +75,6 @@ class MySQLDB(SQLBase):
         :return:
         """
         with self.connection.cursor() as cursor:
-            self.connection.ping(reconnect=True)
             cursor.execute(sql)
             last_id = cursor.lastrowid
             self.connection.commit()
@@ -134,4 +131,3 @@ class MySQLDB(SQLBase):
                 self.delete_data(table)
             for data in data_list:
                 self.insert_data(table, data)
-        self.close()

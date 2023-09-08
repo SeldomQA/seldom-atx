@@ -2,7 +2,7 @@
 case more threading
 """
 from threading import Thread
-from seldom.logging import log
+from seldom_atx.logging import log
 
 
 class ThreadWait:
@@ -15,7 +15,7 @@ class ThreadWait:
     thread_dict = {}
 
     class SeldomThread(Thread):
-        """seldom thread"""
+        """seldom_atx thread"""
 
         def __init__(self, func, name='', *args, **kwargs):
             Thread.__init__(self)

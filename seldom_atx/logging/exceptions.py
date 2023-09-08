@@ -1,11 +1,11 @@
 """
-Exceptions that may happen in all the seldom code.
+Exceptions that may happen in all the seldom_atx code.
 """
 
 
 class SeldomException(Exception):
     """
-    Base seldom exception.
+    Base seldom_atx exception.
     """
 
     def __init__(self, msg: str = None, screen: str = None, stacktrace: str = None):
