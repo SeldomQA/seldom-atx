@@ -1,9 +1,11 @@
+import base64
 import os
 import time
 import contextlib
 import io
 import socket
 import threading
+from datetime import datetime
 import imageio
 import tidevice
 from seldom.logging import log
@@ -11,6 +13,7 @@ from seldom.logging.exceptions import NotFindElementError
 from seldom.running.config import Seldom, AppConfig
 
 __all__ = ["WDADriver", "WDAElement", "make_screenrecord", "wda_"]
+
 
 keycodes = {
     'HOME': 'home',
@@ -32,8 +35,9 @@ LOCATOR_LIST = {
 
 class WDAObj:
     c = None  # device
-    t = tidevice.Device()
-    t.create_inner_connection()
+    if Seldom.platformName == 'iOS':
+        t = tidevice.Device()
+        t.create_inner_connection()
     s = None  # session
     e = None  # element
 
@@ -89,7 +93,8 @@ class WDAElement:
             if LOCATOR_LIST.get(by) is None:
                 setattr(self, by, value)
                 del self.kwargs[by]
-                # log.trace(f'del element kwargs -> {by}:{value}')
+        if not self.kwargs:
+            raise ValueError(f"No supported elements found.")
         self.find_elem_info = None
         self.find_elem_warn = None
 
@@ -154,7 +159,8 @@ class WDADriver:
             package_name: the application id to be removed
 
         """
-
+        if not package_name:
+            package_name = Seldom.appPackage
         os.system(f'tidevice uninstall {package_name}')
         log.info(f'Remove APP ---> {package_name}')
         return self
@@ -314,51 +320,22 @@ class WDADriver:
             # self.save_screenshot(report=True)
         return result
 
+    @staticmethod
+    def save_screenshot(file_path: str = None, report: bool = False) -> None:
+        """Saves a screenshots of the current window to a PNG image file."""
+        screenshot = Seldom.driver.screenshot()
+        if file_path is None:
+            file_path = os.path.join(AppConfig.PERF_RUN_FOLDER,
+                                     f'{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.png')
 
-    # @staticmethod
-    # def save_screenshot(file_path: str = None, index: int = 0, **kwargs) -> None:
-    #     """
-    #     Saves a screenshots of the current window to a PNG image file.
-    #
-    #     Usage:
-    #         self.save_screenshot()
-    #         self.save_screenshot('/Screenshots/foo.png')
-    #         self.save_screenshot(id_="bLogo", index=0)
-    #     """
-    #
-    #     if file_path is None:
-    #         img_dir = os.path.join(os.getcwd(), "reports", "images")
-    #         if os.path.exists(img_dir) is False:
-    #             os.mkdir(img_dir)
-    #         file_path = os.path.join(img_dir, get_timestamp() + ".png")
-    #
-    #     if len(kwargs) == 0:
-    #         log.info(f"📷️ screenshot -> ({file_path}).")
-    #         Seldom.driver.save_screenshot(file_path)
-    #     else:
-    #         log.info(f"📷️ element screenshot -> ({file_path}).")
-    #         wda_elem = WDAElement(**kwargs)
-    #         elem = wda_elem.get_elements(index)
-    #         elem.screenshot(file_path)
-    #
-    # def screenshots(self) -> None:
-    #     """
-    #     Saves a screenshots of the current window to HTML report.
-    #
-    #     Usage:
-    #         self.screenshots()
-    #     """
-    #     image = self.d.screenshot()
-    #     if Seldom.debug is True:
-    #         img_dir = os.path.join(os.getcwd(), "reports", "images")
-    #         if os.path.exists(img_dir) is False:
-    #             os.mkdir(img_dir)
-    #         file_path = os.path.join(img_dir, get_timestamp() + ".png")
-    #         log.info(f"📷️ screenshot -> ({file_path}).")
-    #         Seldom.driver.save_screenshot(file_path)
-    #     else:
-    #         log.info("📷️ screenshot -> HTML report.")
-    #         self.images.append(Seldom.driver.get_screenshot_as_base64())
+        log.info(f"📷️ screenshot -> ({file_path}).")
+        screenshot.save(file_path)
+        if report:
+            with open(file_path, "rb") as image_file:
+                image_bytes = image_file.read()
+                base64_data = base64.b64encode(image_bytes)
+                base64_string = base64_data.decode("utf-8")
+            AppConfig.REPORT_IMAGE.extend([base64_string])
 
     @staticmethod
     def get_element(index: int = 0, **kwargs):

@@ -130,7 +130,7 @@ class TidevicePerf:
 
     def start(self, pkgName=None):
         if pkgName is None:
-            pkgName = Seldom.app_info.get('platformName')
+            pkgName = Seldom.appPackage
         self.mem_list = []
         self.mem_time_list = []
         self.cpu_list = []
@@ -346,10 +346,10 @@ def run_testcase(func, *args, **kwargs):
         Common.CASE_ERROR.append(f"{e}")
         log.error(f'Error in run_testcase: {e}')
         raise e
-    if Common.record and (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
+    if Common.record and Seldom.platformName == 'Android':
         time.sleep(1)
         u2.stop_recording()
-    elif Common.record and (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'iOS'):
+    elif Common.record and Seldom.platformName == 'iOS':
         Common.record = False
         if Common.iOS_perf_obj is not None:
             Common.iOS_perf_obj.stop()
@@ -363,7 +363,7 @@ def get_log(log_path, run_path):
         AppConfig.log = True
         while not os.path.exists(run_path):
             time.sleep(1)
-        if (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
+        if Seldom.platformName == 'Android':
             u2.write_log(log_path)
     except Exception as e:
         Common.LOGS_ERROR.append(f"{e}")
@@ -373,8 +373,8 @@ def get_log(log_path, run_path):
 def get_perf():
     """Obtain mobile device performance data"""
     try:
-        if (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
-            perf = MySoloX(pkgName=Seldom.app_info.get('appPackage'), platform=Seldom.app_info.get('platformName'))
+        if Seldom.platformName == 'Android':
+            perf = MySoloX(pkgName=Seldom.appPackage, platform=Seldom.platformName)
             new_cpu = gevent.spawn(perf.get_cpu)
             new_mem = gevent.spawn(perf.get_mem)
             new_fps = gevent.spawn(perf.get_fps)
@@ -382,7 +382,7 @@ def get_perf():
             cache.set({'CPU_INFO': new_cpu.value})
             cache.set({'MEM_INFO': new_mem.value})
             cache.set({'FPS_INFO': new_fps.value})
-        elif (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'iOS'):
+        elif Seldom.platformName == 'iOS':
             Common.iOS_perf_obj = TidevicePerf()
             Common.iOS_perf_obj.start()
     except Exception as e:
@@ -396,13 +396,13 @@ def start_record(video_path, run_path):
     while Common.threadLock and Seldom.driver:
         if Common.record:
             try:
-                if (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'iOS'):
+                if Seldom.platformName == 'iOS':
                     # while not WDAObj.c:
                     #     time.sleep(1)
                     with make_screenrecord(output_video_path=video_path):
                         while Common.record:
                             time.sleep(1)
-                elif (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
+                elif Seldom.platformName == 'Android':
                     u2.start_recording(video_path)
             except Exception as e:
                 Common.RECORD_ERROR.append(f"{e}")
@@ -427,7 +427,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
             cache.set({'TESTCASE_NAME': testcase_name})
             cache.set({'TESTCASE_CLASS_NAME': testcase_class_name})
             run_times = 1
-            folder_time = datetime.now().strftime("%Y_%m_%d_%H_%M")  # 以当前时间来命名文件夹
+            folder_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")  # 以当前时间来命名文件夹
             if AppConfig.PERF_OUTPUT_FOLDER is None:
                 raise ValueError('Please do not run in debug mode or specify "AppConfig.PERF_OUTPUT_FOLDER" directory!')
             testcase_base_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, testcase_folder_name, testcase_class_name,
@@ -485,7 +485,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                 Common.record = False
 
                 # --------------------------Run test case--------------------------
-                if get_logs and (Seldom.app_info.get('platformName') == 'Android'):
+                if get_logs and Seldom.platformName == 'Android':
                     log_thread = threading.Thread(target=get_log, args=(log_path, run_path))
                     log_thread.start()
                 do_list = [gevent.spawn(run_testcase, func, *args, **kwargs),
@@ -518,9 +518,9 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                     start_frame_list.append(Common.image_to_base64(start_frame_path))
                     stop_frame_list.append(Common.image_to_base64(stop_frame_path))
                     if run_times != 1:
-                        if (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'Android'):
+                        if Seldom.platformName == 'Android':
                             u2.launch_app(stop=True)
-                        elif (Seldom.app_server is None) and (Seldom.app_info.get('platformName') == 'iOS'):
+                        elif Seldom.platformName == 'iOS':
                             wda_.launch_app(stop=True)
 
                 # --------------------------Performance image saved locally and converted to base64--------------------
@@ -555,7 +555,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                 file_class_name = f"{testcase_file_name} --> {testcase_class_name}"
                 in_excel_times = AppConfig.STRESS_TIMES if MODE == RunType.STRESS else duration_times
                 test_case_data = {'Time': folder_time, 'TestCasePath': file_class_name, 'TestCaseName': testcase_name,
-                                  'TestCaseDesc': testcase_desc, 'Device': Seldom.app_info.get('platformName'),
+                                  'TestCaseDesc': testcase_desc, 'Device': Seldom.platformName,
                                   'Times': in_excel_times, 'MODE': mode}
                 # --------------------------Time consumption or memory threshold assertion--------------------------
                 if MODE == RunType.DURATION:

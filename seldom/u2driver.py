@@ -2,10 +2,11 @@
 uiautomator2 driver API
 """
 import base64
+from datetime import datetime
 import os
 import time
 from typing import Tuple
-from seldom.testdata import get_word, get_now_datetime
+from seldom.testdata import get_word
 from seldom.logging import log
 from seldom.running.config import Seldom, AppConfig
 from seldom.logging.exceptions import NotFindElementError
@@ -280,7 +281,8 @@ class U2Driver:
         """Saves a screenshots of the current window to a PNG image file."""
         screenshot = Seldom.driver.screenshot()
         if file_path is None:
-            file_path = os.path.join(AppConfig.PERF_RUN_FOLDER, f"{get_now_datetime(strftime=True)}.png")
+            file_path = os.path.join(AppConfig.PERF_RUN_FOLDER,
+                                     f'{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.png')
 
         log.info(f"📷️ screenshot -> ({file_path}).")
         screenshot.save(file_path)
@@ -295,7 +297,8 @@ class U2Driver:
     def write_log(save_path: str = None) -> None:
         """write android logs in save_path."""
         if not save_path:
-            save_path = os.path.join(AppConfig.PERF_RUN_FOLDER, f"{get_now_datetime(strftime=True)}.txt")
+            save_path = os.path.join(AppConfig.PERF_RUN_FOLDER,
+                                     f'{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.txt')
         if not os.path.exists(save_path):
             open(save_path, "w").close()
         try:

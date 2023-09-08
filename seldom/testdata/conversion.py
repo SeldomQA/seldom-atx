@@ -7,7 +7,7 @@ from itertools import islice
 import codecs
 
 import yaml
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 
 
 def check_data(list_data: list) -> list:
@@ -139,3 +139,22 @@ def yaml_to_list(file: str = None, key: str = None) -> list:
                 raise ValueError(f"Check the YAML test data, no '{key}'") from exc
 
     return list_data
+
+
+def write_to_excel(data, filename):
+    wb = Workbook()
+    ws = wb.active
+    headers = set()
+    for d in data:
+        headers.update(d.keys())
+
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num)
+        cell.value = header
+
+    for row_num, row_data in enumerate(data, 2):
+        for col_num, col_name in enumerate(headers, 1):
+            cell = ws.cell(row=row_num, column=col_num)
+            cell.value = row_data.get(col_name)
+
+    wb.save(filename)
