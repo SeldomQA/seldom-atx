@@ -39,7 +39,8 @@ setup(
         'uiautomator2==2.16.23',
         'uiautomator2[image]==2.16.23',
         'matplotlib==3.7.1',
-        'gevent==23.7.0'
+        'gevent==23.7.0',
+        'jinja2==3.1.2'
     ],
     classifiers=[
         'Intended Audience :: Developers',
