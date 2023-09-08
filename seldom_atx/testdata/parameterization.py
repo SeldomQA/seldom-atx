@@ -5,8 +5,6 @@ import os
 import inspect as sys_inspect
 import warnings
 from functools import wraps
-
-import requests
 from parameterized.parameterized import inspect
 from parameterized.parameterized import parameterized
 from parameterized.parameterized import skip_on_empty_helper
@@ -19,9 +17,7 @@ from parameterized import parameterized_class
 from seldom_atx.testdata import conversion
 from seldom_atx.logging.exceptions import FileTypeError
 from seldom_atx.logging import log
-from seldom_atx.utils import jmespath as utils_jmespath
 from seldom_atx import Seldom
-
 
 __all__ = [
     "file_data", "data", "data_class"
@@ -96,7 +92,8 @@ def find_file(file: str, file_dir: str) -> str:
             parent_dir = os.path.join(os.path.dirname(file_dir), file)
             parent_dir_dir = os.path.join(os.path.dirname(os.path.dirname(file_dir)), file)
             parent_dir_dir_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(file_dir))), file)
-            parent_dir_dir_dir_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(file_dir)))), file)
+            parent_dir_dir_dir_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(file_dir)))), file)
 
             if os.path.isfile(current_dir) is True:
                 file_path = current_dir
@@ -172,35 +169,6 @@ def file_data(file: str, line: int = 1, sheet: str = "Sheet1", key: str = None, 
         raise FileTypeError(f"Your file is not supported: {file}")
 
     return data(data_list)
-
-
-# def api_data(url: str = None, params: dict = None, headers: dict = None, ret: str = None):
-#     """
-#     Support api data parameterization.
-#     :param url:
-#     :param params:
-#     :param headers:
-#     :param ret:
-#     :return:
-#     """
-#
-#     if url is None and Seldom.api_data_url is None:
-#         raise ValueError("url is not None")
-#
-#     url = url if url is not None else Seldom.api_data_url
-#     resp = requests.get(url, params=params, headers=headers).json()
-#
-#     if ret is not None:
-#         data_ = utils_jmespath(resp, ret)
-#         if data_ is None:
-#             raise ValueError(f"Error - return {ret} is None in {resp}")
-#         if isinstance(data_, list) is False:
-#             raise TypeError(f"Error - {data_} is not list")
-#         return data(data_)
-#
-#     if isinstance(resp, list) is False:
-#         raise TypeError(f"Error - {resp} is not list")
-#     return data(resp)
 
 
 def data(input, name_func=None, doc_func=None, skip_on_empty=False, **legacy):
@@ -300,7 +268,7 @@ def default_doc_func(func, num, p):
     first_args_with_values = [all_args_with_values[0]]
 
     # Assumes that the function passed is a bound method.
-    descs = ["%s=%s" %(n, short_repr(v)) for n, v in first_args_with_values]
+    descs = ["%s=%s" % (n, short_repr(v)) for n, v in first_args_with_values]
 
     # The documentation might be a multiline string, so split it
     # and just work with the first string, ignoring the period
@@ -310,7 +278,7 @@ def default_doc_func(func, num, p):
     if first.endswith("."):
         suffix = "."
         first = first[:-1]
-    args = "%s[%s]" %(len(first) and " " or "", ", ".join(descs))
+    args = "%s[%s]" % (len(first) and " " or "", ", ".join(descs))
     return "".join(
         to_text(x)
         for x in [first.rstrip(), args, suffix, nl, rest]

@@ -1,9 +1,3 @@
-"""
-soloX:
-https://github.com/smart-test-ti/SoloX
-tidevice:
-https://github.com/alibaba/taobao-iphone-device
-"""
 import os
 import cv2
 import time
@@ -15,18 +9,19 @@ import threading
 import statistics
 import matplotlib
 import numpy as np
-from . import cache
-from seldom_atx.logging import log
-from seldom_atx.running.config import Seldom, AppConfig
-from ..u2driver import u2
-from ..wdadriver import wda_, make_screenrecord
+from functools import wraps
+from datetime import datetime
 from matplotlib import pyplot as plt
 from matplotlib import dates as mdates
 from dateutil import parser
 from tidevice._perf import DataType
-from functools import wraps
-from datetime import datetime
 from solox.public.apm import Memory, CPU, FPS
+from seldom_atx.utils import cache
+from seldom_atx.logging import log
+from seldom_atx.running.config import Seldom, AppConfig
+from seldom_atx.running.loader_hook import loader
+from seldom_atx.u2driver import u2
+from seldom_atx.wdadriver import wda_, make_screenrecord
 
 
 class MySoloX:
@@ -411,14 +406,18 @@ def start_record(video_path, run_path):
         time.sleep(1.5)
 
 
-def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 800,
+def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             duration_threshold: int = 100, write_excel: bool = True, get_logs: bool = True):
-    """Decorator for performance data"""
+    """性能数据装饰器"""
 
     def my_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # --------------------------initialization--------------------------
+            # --------------------------初始化--------------------------
+            frame_path = None
+            start_path = None
+            stop_path = None
+            perf_path = None
             testcase_name = func.__name__  # test case name
             testcase_desc = func.__doc__  # test case desc
             testcase_file_name = os.path.split(inspect.getsourcefile(func))[1]  # 获取被装饰函数所在的模块文件路径
@@ -440,7 +439,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                 log.info(f'Recording and framing mode:{testcase_name}')
             elif MODE == RunType.DURATION:
                 log.info(f'Calculation time consumption mode:{testcase_name}')
-                run_times = duration_times
+                run_times = duration_times if duration_times is not None else AppConfig.DURATION_TIMES
                 start_path = os.path.join(testcase_base_path, 'start.jpg')  # 开始帧的位置
                 stop_path = os.path.join(testcase_base_path, 'stop.jpg')  # 结束帧的位置
                 if not os.path.exists(start_path) or not os.path.exists(stop_path):
@@ -454,6 +453,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                 log.info(f'Stress test mode:{testcase_name}')
             else:
                 raise ValueError
+            AppConfig.REPORT_IMAGE = []
             duration_list = []
             cpu_base64_list = []
             mem_base64_list = []
@@ -484,7 +484,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                 Common.threadLock = True
                 Common.record = False
 
-                # --------------------------Run test case--------------------------
+                # --------------------------执行用例--------------------------
                 if get_logs and Seldom.platformName == 'Android':
                     log_thread = threading.Thread(target=get_log, args=(log_path, run_path))
                     log_thread.start()
@@ -496,12 +496,12 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                 if Common.CASE_ERROR:
                     log.error(f'{Common.CASE_ERROR}')
                     assert False, f'{Common.CASE_ERROR}'
-                # --------------------------Frame the recording screen--------------------------
+                # --------------------------录屏文件分帧--------------------------
                 if MODE in [RunType.DEBUG, RunType.DURATION] and Common.RECORD_ERROR == []:
                     log.info("✅正在进行录屏分帧")
                     Common.extract_frames(video_path, frame_path)
                     log.info("✅录屏分帧结束")
-                # --------------------------Find keyframes--------------------------
+                # --------------------------寻找关键帧--------------------------
                 if MODE == RunType.DURATION and Common.RECORD_ERROR == []:
                     log.info("🌝Start searching for the most similar start frame")
                     start_frame_path = Common.find_best_frame(start_path, frame_path)
@@ -511,7 +511,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                     stop_frame_path = Common.find_best_frame(stop_path, frame_path, is_start=False)
                     stop_frame = int(os.path.split(stop_frame_path)[1].split('.')[0][-6:])
                     log.info(f"Stop frame:[{stop_frame}]")
-                    # --------------------------Calculation time consumption--------------------------
+                    # --------------------------计算耗时--------------------------
                     duration = round((stop_frame - start_frame) / AppConfig.FPS, 2)
                     log.info(f"🌈[{testcase_name}]Func time consume[{duration}]s")
                     duration_list.append(duration)
@@ -523,7 +523,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                         elif Seldom.platformName == 'iOS':
                             wda_.launch_app(stop=True)
 
-                # --------------------------Performance image saved locally and converted to base64--------------------
+                # --------------------------性能图像保存在本地并转换为base64--------------------
                 if MODE in [RunType.DURATION, RunType.STRESS] and Common.PERF_ERROR == []:
                     # CPU
                     cpu_info = cache.get('CPU_INFO')
@@ -545,25 +545,25 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                         fps_base64_list.append(
                             Common.draw_chart(fps_info[1], fps_info[0], ['fps', 'jank'], jpg_name=fps_image_path,
                                               label_title='Fps'))
-            # --------------------------Picture Write Back Report--------------------------
+            # --------------------------图片回写报告--------------------------
             if MODE in [RunType.DEBUG, RunType.DURATION, RunType.STRESS] and Common.PERF_ERROR == []:
                 photo_list = cpu_base64_list + mem_base64_list + fps_base64_list + flo_base64_list \
                              + bat_base64_list + start_frame_list + stop_frame_list
                 AppConfig.REPORT_IMAGE.extend(photo_list)
-                # --------------------------Data Write Back Table--------------------------
+                # --------------------------数据回写表格--------------------------
                 mode = 'DurationTest' if MODE == RunType.DURATION else 'StressTest'
                 file_class_name = f"{testcase_file_name} --> {testcase_class_name}"
-                in_excel_times = AppConfig.STRESS_TIMES if MODE == RunType.STRESS else duration_times
+                in_excel_times = AppConfig.STRESS_TIMES if MODE == RunType.STRESS else run_times
                 test_case_data = {'Time': folder_time, 'TestCasePath': file_class_name, 'TestCaseName': testcase_name,
                                   'TestCaseDesc': testcase_desc, 'Device': Seldom.platformName,
                                   'Times': in_excel_times, 'MODE': mode}
-                # --------------------------Time consumption or memory threshold assertion--------------------------
+                # --------------------------耗时或内存阈值断言--------------------------
                 if MODE == RunType.DURATION:
                     max_duration_res = round(statistics.mean(duration_list), 2)
                     log.success("🌈Average time consumption of functions[{:.2f}]s".format(max_duration_res))
                     if max_duration_res > duration_threshold:
-                        max_duration_res = f"Average time consumption{max_duration_res}," \
-                                           f"Exceeding threshold{duration_threshold}"
+                        max_duration_res = f"{run_times}次平均耗时：{max_duration_res}s," \
+                                           f"设定阈值：{duration_threshold}s."
                         testcase_assert = False
                         log.warning(max_duration_res)
                     test_case_data.update({'DurationList': str(duration_list), 'DurationAvg': max_duration_res})
@@ -572,7 +572,7 @@ def AppPerf(MODE, duration_times=AppConfig.DURATION_TIMES, mem_threshold: int = 
                 elif MODE == RunType.STRESS:
                     max_mem_res = max([tup[0] for tup in cache.get('MEM_INFO')[1]])
                     if max_mem_res > mem_threshold:
-                        max_mem_res = f"Maximum Memory{max_mem_res},Exceeding threshold{mem_threshold}"
+                        max_mem_res = f"最大内存：{max_mem_res},设定阈值：{mem_threshold}."
                         testcase_assert = False
                         log.warning(max_mem_res)
                     test_case_data.update({'MemMax': max_mem_res})

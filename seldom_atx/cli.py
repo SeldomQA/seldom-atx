@@ -7,13 +7,12 @@ import ssl
 import json
 import click
 import seldom_atx
-from seldom_atx import Seldom
+from seldom_atx import Seldom, AppConfig
 from seldom_atx import SeldomTestLoader
 from seldom_atx import TestMainExtend
 from seldom_atx.logging import log, log_cfg
 from seldom_atx.utils import file
 from seldom_atx.utils import cache
-from seldom_atx.har2case.core import HarParser
 from seldom_atx.running.loader_hook import loader
 from seldom_atx import __version__
 
@@ -43,9 +42,8 @@ ssl._create_default_https_context = ssl._create_unverified_context
 @click.option("-ll", "--log-level",
               type=click.Choice(['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR']),
               help="Set the log level.")
-@click.option("-h2c", "--har2case", help="HAR file converts an interface test case.")
 def main(project, clear_cache, path, collect, level, case_json, env, debug, rerun, report, mod,
-         log_level, har2case):
+         log_level):
     """
     seldom_atx CLI.
     """
@@ -74,6 +72,8 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
     language = loader("language") if loader("language") is not None else "en"
     whitelist = loader("whitelist") if loader("whitelist") is not None else []
     blacklist = loader("blacklist") if loader("blacklist") is not None else []
+    AppConfig.DURATION_TIMES = loader("duration_times") if loader(
+        "duration_times") is not None else AppConfig.DURATION_TIMES
 
     if path:
         Seldom.env = env
@@ -144,11 +144,6 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
             description=description, rerun=rerun, language=language,
             whitelist=whitelist, blacklist=blacklist)
         loader("end_run")
-        return 0
-
-    if har2case:
-        har_parser = HarParser(har2case)
-        har_parser.gen_testcase()
         return 0
 
 

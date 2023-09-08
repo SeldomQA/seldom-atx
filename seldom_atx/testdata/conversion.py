@@ -142,6 +142,7 @@ def yaml_to_list(file: str = None, key: str = None) -> list:
 
 
 def write_to_excel(data, filename):
+    """把列表嵌套字典的数据生成一个excel表格"""
     wb = Workbook()
     ws = wb.active
     headers = set()

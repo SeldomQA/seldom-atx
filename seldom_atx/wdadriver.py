@@ -127,7 +127,7 @@ class WDAElement:
 
 
 class WDADriver:
-    """facebook-wda driver"""
+    """iOS驱动"""
 
     def __init__(self):
         WDAObj.c = Seldom.driver

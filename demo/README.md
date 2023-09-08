@@ -15,15 +15,13 @@
 ├── test_data   # 测试数据
 └── test_dir    # 测试用例
     ├── __init__.py
-    ├── api_case  # http接口用例
-    ├── app_case  # app UI 自动化用例
-    └── web_case  # web UI 自动化用例
+    └── app_case  # app UI 自动化用例
 ```
 
 * 请安装 seldom 最新版本。
 
 ```shell
-> pip install -U seldom
+> pip install -U git+https://github.com/SeldomQA/seldom-atx.git
 ```
 
 * 确保 seldom 命令可用。
@@ -41,10 +39,10 @@ seldom 从 3.1 开始支持 `confrun.py` 配置运行钩子函数，并推荐你
 |-------------|---------|-----------------------------------------------------------|
 | start_run() | fixture | 运行测试之前执行                                                  |
 | end_run()   | fixture | 运行测试之后执行                                                  |
-| browser()   | web     | 设置浏览器类型：gc(google chrome)/ff(firefox)/edge/ie/safari      |
 | base_url()  | api     | 设置http接口基本url: 例如 http://httpbin.org                      |
-| app_info()  | app     | 基于appium，启动app信息                                          |
-| app_server()  | app     | 基于appium，设置appium 服务地址+端口                             |
+| platformName()  | app     | app的设备类型，例如：Android或iOS                                          |
+| appPackage()  | app     | app的包名，例如：com.android.settings                             |
+| deviceId()  | app     | app的设备ID或UDID，例如：f5ede5e3                             |
 | debug()  | general     | 是否开启debug模式：True/False                                    |
 | rerun()  | general     | 用例失败/错误重跑，默认：0                                            |
 | report()  | general     | 指定报告生成地址，例如： `/User/tech/xxx.html`、  `/User/tech/xxx.xml` |
@@ -61,73 +59,39 @@ __特殊配置__
 
 特殊配置是针对不同的测试类型设置的配置。
 
-* web UI 自动化配置
-
-```python
-# confrun.py
-
-def browser():
-    """
-    Web UI test:
-    browser: gc(google chrome)/ff(firefox)/edge/ie/safari
-    """
-    return "gc"
-```
-
-运行测试：
-
-```shell
-> seldom --path test_dir/web_case/
-> seldom --path test_dir/web_case/test_playwright_demo.py
-```
-
-* http 接口测试
-
-```python
-# confrun.py
-
-def base_url():
-    """
-    http test
-    api base url
-    """
-    return "http://httpbin.org"
-```
-
-运行测试：
-
-```shell
-> seldom --path test_dir/web_case/
-```
-
 * app UI 自动化测试
 
 ```python
 # confrun.py
 
-def app_info():
+def platformName():
     """
     app UI test
-    appium app config
+    between Android and iOS
     """
-    desired_caps = {
-        'deviceName': 'JEF_AN20',
-        'automationName': 'UiAutomator2',
-        'platformName': 'Android',
-        'platformVersion': '10.0',
-        'appPackage': 'com.meizu.flyme.flymebbs',
-        'appActivity': '.ui.LoadingActivity',
-        'noReset': True,
-    }
-    return desired_caps
+    return "Android"
 
 
-def app_server():
+def appPackage():
     """
     app UI test
-    appium server/desktop address
+    test app package name
     """
-    return "http://127.0.0.1:4723"
+    return "com.android.settings"
+
+
+def deviceId():
+    """
+    app UI test
+    Android: device id
+    iOS: udid
+    """
+    return "f5ede5e3"
+
+
+def duration_times():
+    """耗时性能测试用例重复次数"""
+    return 3
 ```
 
 运行测试：
@@ -178,7 +142,7 @@ def title():
     """
     setting report title
     """
-    return "seldom test report"
+    return "seldom_atx test report"
 
 
 def tester():

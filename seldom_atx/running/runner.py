@@ -34,6 +34,7 @@ SELDOM_STR = f"""
 -----------------------------------------
                              @itest.info
 """
+DEVICE_LIST = ['Android', 'iOS']
 
 
 class TestMain:
@@ -99,6 +100,9 @@ class TestMain:
         Seldom.platformName = platformName
         Seldom.deviceId = deviceId
         Seldom.appPackage = appPackage
+
+        if Seldom.platformName not in DEVICE_LIST:
+            raise TypeError(f"platformName [{platformName}] must be between iOS and Android.")
 
         if isinstance(timeout, int) is False:
             raise TypeError(f"Timeout {timeout} is not integer.")
@@ -177,12 +181,6 @@ class TestMain:
             if AppConfig.WRITE_EXCEL:
                 write_to_excel(data=AppConfig.WRITE_EXCEL,
                                filename=os.path.join(report_folder, f'{os.path.basename(report_path)[:26]}.xlsx'))
-                # import pandas as pd
-                # df = pd.DataFrame(AppConfig.WRITE_EXCEL)
-                # with pd.ExcelWriter(
-                #         os.path.join(report_folder, f'{os.path.basename(report_path)[:26]}.xlsx'),
-                #         engine='xlsxwriter') as writer:
-                #     df.to_excel(writer, sheet_name='Sheet1', index=False)
 
             log.success(f"generated html file: file:///{report_path}")
             log.success(f"generated log file: file:///{BrowserConfig.LOG_PATH}")
