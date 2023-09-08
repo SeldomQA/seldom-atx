@@ -32,8 +32,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
               help="Parse the level of use cases. Need the --path.")
 @click.option("-j", "--case-json", default=None, help="Test case files. Need the `--path`.")
 @click.option("-e", "--env", default=None, help="Set the Seldom run environment `Seldom.env`.")
-@click.option("-u", "--base-url", default=None,
-              help="The base-url that runs the HTTP automation tests. Need the `--path`.")
 @click.option("-d/-nd", "--debug/--no-debug", default=False, help="Debug mode. Need the `--path`.")
 @click.option("-rr", "--rerun", default=0, type=int,
               help="The number of times a use case failed to run again. Need the `--path`.")
