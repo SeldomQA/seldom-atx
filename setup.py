@@ -10,7 +10,7 @@ with open('seldom/__init__.py', 'rb') as f:
         f.read().decode('utf-8')).group(1)))
 
 setup(
-    name='seldom',
+    name='seldom-atx',
     version=version,
     url='https://github.com/SeldomQA/seldom-atx',
     license='Apache-2.0',

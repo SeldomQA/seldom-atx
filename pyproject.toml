@@ -10,7 +10,7 @@ homepage = "https://github.com/SeldomQA/seldom-atx"
 repository = "https://github.com/SeldomQA/seldom-atx"
 documentation = "https://github.com/SeldomQA/seldom-atx"
 
-keywords = ["sedom", "openatx", "app"]
+keywords = ["seldom", "openatx", "app"]
 
 classifiers = [
     'Intended Audience :: Developers',
