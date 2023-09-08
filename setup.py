@@ -34,7 +34,6 @@ setup(
         'genson==1.2.2',
         'click~=8.1.3',
         'python-dateutil==2.8.2',
-        'solox',
         'facebook-wda==1.4.6',
         'uiautomator2==2.16.23',
         'uiautomator2[image]==2.16.23',
