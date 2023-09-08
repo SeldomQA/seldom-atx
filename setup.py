@@ -34,13 +34,14 @@ setup(
         'genson==1.2.2',
         'click~=8.1.3',
         'python-dateutil==2.8.2',
-        'solox==2.7.2 --ignore-installed',
+        'solox',
         'facebook-wda==1.4.6',
         'uiautomator2==2.16.23',
         'uiautomator2[image]==2.16.23',
         'matplotlib==3.7.1',
         'gevent==23.7.0',
-        'jinja2==3.1.2'
+        'jinja2==3.1.2',
+        'tidevice==0.11.0'
     ],
     classifiers=[
         'Intended Audience :: Developers',
