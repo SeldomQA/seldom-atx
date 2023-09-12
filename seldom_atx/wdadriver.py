@@ -14,7 +14,6 @@ from seldom_atx.running.config import Seldom, AppConfig
 
 __all__ = ["WDADriver", "WDAElement", "make_screenrecord", "wda_"]
 
-
 keycodes = {
     'HOME': 'home',
     'BACK': 'back',
@@ -35,9 +34,11 @@ LOCATOR_LIST = {
 
 class WDAObj:
     c = None  # device
-    if Seldom.platformName == 'iOS':
+    try:
         t = tidevice.Device()
         t.create_inner_connection()
+    except Exception:
+        pass  # 如果当前设备为Android时，会报找不到设备异常，这里跳过异常
     s = None  # session
     e = None  # element
 
@@ -264,43 +265,29 @@ class WDADriver:
         log.info(f"✅ {wda_elem.info} -> get text: {text}.")
         return text
 
-    # @staticmethod
-    # def get_display_u2(index: int = 0, **kwargs) -> bool:
-    #     """
-    #     Gets the element to display,The return result is true or false.
-    #
-    #     Usage:
-    #         self.get_display(css="#el")
-    #     """
-    #     if 'elem' in kwargs:
-    #         wda_elem = kwargs['elem']
-    #     else:
-    #         wda_elem = WDAElement(**kwargs)
-    #     elem = wda_elem.get_elements(index, empty=True)
-    #     if not elem:
-    #         return False
-    #     else:
-    #         result = elem.exists
-    #         log.info(f"✅ {wda_elem.info} -> element is display: {result}.")
-    #         return result
-
     @staticmethod
-    def wait(timeout: float = 5, index: int = 0, noLog=False, **kwargs) -> bool:
-        """
-        Implicitly wait element on the page.
-        """
+    def get_display(index: int = 0, **kwargs) -> bool:
+        """获取当前某元素的可见状态"""
+        wda_elem = WDAElement(**kwargs)
+        result = WDAObj.s(**kwargs, visible=True, index=index).exists
+        log.info(f"✅ {wda_elem.kwargs} -> exists: {result}.")
+        return result
+
+    def wait(self, timeout: float = 5, index: int = 0, noLog=False, **kwargs) -> bool:
+        """等待某元素出现"""
         wda_elem = WDAElement(**kwargs)
 
         timeout_backups = Seldom.timeout
         Seldom.timeout = timeout
         if noLog is not True:
-            log.info(f"⌛️ wait {wda_elem.desc} to exist: {timeout}s.")
+            log.info(f"⌛ wait {wda_elem.kwargs} to exist: {timeout}s.")
         try:
-            wda_elem.get_elements(index, empty=kwargs.get('empty', False)).wait(timeout=timeout)
+            WDAObj.s(**kwargs, visible=True, index=index).wait(timeout=timeout)
             result = True
-        except:
+        except Exception:
             if noLog is not True:
-                log.info(f"❌Element {wda_elem.desc} not exist")
+                log.info(f"❌ Element {wda_elem.kwargs} not exist")
+                self.save_screenshot(report=True)
             result = False
         Seldom.timeout = timeout_backups
         return result
@@ -313,11 +300,12 @@ class WDADriver:
         if not timeout:
             timeout = Seldom.timeout
         wda_elem = WDAElement(**kwargs)
-        log.info(f"⌛ wait {wda_elem.desc} gone: timeout={timeout}s.")
-        result = wda_elem.get_elements(index, empty=kwargs.get('empty', False)).wait_gone(timeout=timeout)
+        log.info(f"⌛ wait {wda_elem.kwargs} gone: timeout={timeout}s.")
+        result = WDAObj.s(**kwargs, visible=True, index=index).wait_gone(timeout=timeout)
+
         if not result:
-            log.warning(f'⌛ wait {wda_elem.desc} gone failed.')
-            # self.save_screenshot(report=True)
+            log.warning(f'⌛ wait {wda_elem.kwargs} gone failed.')
+            self.save_screenshot(report=True)
         return result
 
     @staticmethod

@@ -202,6 +202,21 @@ class U2Driver:
         log.info(f"✅ {u2_elem.info} -> text: {text}.")
         return text
 
+    def get_text_page(self, stable=False):
+        """
+        获取页面所有元素的文本内容
+        """
+        if stable:
+            self.wait_stable()
+        try:
+            texts = []
+            for i in Seldom.driver.xpath('//android.widget.TextView|//android.widget.Button').all():
+                texts.append(i.text.strip())
+            log.info(f"✅ All text on the current page -> {texts}.")
+            return texts
+        except Exception as err:
+            return err
+
     @staticmethod
     def get_display(index: int = None, timeout: float = 1.0, **kwargs) -> bool:
         """获取元素可见状态"""
@@ -220,7 +235,7 @@ class U2Driver:
         timeout_backups = Seldom.timeout
         Seldom.timeout = timeout
         if noLog is not True:
-            log.info(f"⌛  {u2_elem.desc} -> wait element: {timeout}s.")
+            log.info(f"⌛ {u2_elem.desc} -> wait element: {timeout}s.")
         try:
             u2_elem.get_elements(empty=kwargs.get('empty', False), index=index).wait(timeout=timeout)
             result = True
@@ -238,7 +253,7 @@ class U2Driver:
             timeout = Seldom.timeout
         u2_elem = U2Element(**kwargs)
         elem = u2_elem.get_elements(empty=kwargs.get('empty', False), index=index)
-        log.info(f"⌛  {u2_elem.desc} -> wait gone: {timeout}s.")
+        log.info(f"⌛ {u2_elem.desc} -> wait gone: {timeout}s.")
         result = elem.wait_gone(timeout=timeout)
         if not result:
             log.warning(f'❌ {u2_elem.desc} -> wait gone failed.')
@@ -256,9 +271,9 @@ class U2Driver:
                 if first_snapshot == second_snapshot:
                     return True
                 else:
-                    log.info('⌛  Wait page stable...')
+                    log.info('⌛ Wait page stable...')
         self.save_screenshot(report=True)
-        raise EnvironmentError("Unstable page")
+        raise EnvironmentError("❌ Unstable page.")
 
     @staticmethod
     def start_recording(output: str = None, fps: int = None) -> None:
@@ -310,7 +325,7 @@ class U2Driver:
                 try:
                     log_list.append(line.decode('utf-8'))
                 except Exception as e:
-                    log.error(f'Error in read log: {e}, but skip!')
+                    log.error(f'❗ Error in read log: {e}, but skip!')
                 if not AppConfig.log:
                     break
             if not AppConfig.log:
@@ -320,10 +335,18 @@ class U2Driver:
                     try:
                         f.write(item + "\n")
                     except Exception as e:
-                        log.warning(f'Error in write log: [{e}], but skip!')
-            log.info(f'Log saved in {save_path}')
+                        log.warning(f'❗ Error in write log: [{e}], but skip!')
+            log.info(f'✅ Log saved in {save_path}')
         except Exception as e:
             raise Exception(f'❌ Error in write_log: {e}.')
+
+    @staticmethod
+    def open_quick_settings():
+        """
+        打开状态栏快速设置
+        """
+        Seldom.driver.open_quick_settings()
+        log.info(f'✅ open quick settings.')
 
     @staticmethod
     def get_elements(**kwargs):
@@ -347,7 +370,7 @@ class U2Driver:
     @staticmethod
     def press(key: str) -> None:
         """按下key"""
-        log.info(f'✅ Press key "{key}".')
+        log.info(f'✅ Press key -> "{key}".')
         keycode = keycodes.get(key)
         Seldom.driver.press(keycode)
 
@@ -406,15 +429,13 @@ class U2Driver:
             self.swipe_up(upper=upper)
             swipe_times += 1
             if swipe_times > times:
-                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find ---> {u2_elem.desc}")
+                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {u2_elem.desc}.")
 
     @staticmethod
     def swipe_down(times: int = 1, upper: bool = False, width: float = 0.5, start: float = 0.1,
                    end: float = 0.9) -> None:
-        """
-        swipe down
-        """
-        log.info(f"swipe down {times} times")
+        """swipe down"""
+        log.info(f"✅ swipe down {times} times.")
 
         if upper is True:
             end = (end / 2)
@@ -462,12 +483,52 @@ class U2Driver:
         return info
 
     @staticmethod
+    def push(file, path):
+        """
+        将文件推送到设备
+        :param file: 电脑文件地址
+        :param path: Android目标路径
+        :return:
+        """
+        Seldom.driver.push(file, path)
+        log.info(f'✅ Push file {file} to {path}.')
+
+    @staticmethod
+    def pull(file, path):
+        """
+        从设备中拉取文件
+        :param file: 手机文件地址
+        :param path: 电脑存放位置
+        :return:
+        """
+        Seldom.driver.pull(file, path)
+        log.info(f'✅ Pull file {file} to {path}.')
+
+    @staticmethod
+    def delete(path):
+        """
+        删除设备上的文件or文件夹
+        :param path: 如果是一个文件则删除文件，如果是一个文件夹则删除文件夹下所有文件
+        :return:
+        """
+        if Seldom.driver.shell(f'test -d "{path}" && echo "directory"').output.strip() == 'directory':
+            Seldom.driver.shell(f'rm -rf {path}/*')
+            log.info(f"✅ Directory {path} is deleted.")
+        elif Seldom.driver.shell(f'test -f "{path}" && echo "file"').output.strip() == 'file':
+            Seldom.driver.shell(f'rm {path}')
+            log.info(f"✅ File {path} is deleted.")
+        else:
+            log.error(f"❌ Path {path} is not exist.")
+
+    @staticmethod
     def func(func_name, **kwargs):
+        """如果遇到没有封装的u2的api，可以使用本方法来调用."""
         try:
             function = getattr(Seldom.driver, func_name)
+            log.info(f"✅ New func {func_name}({kwargs}).")
             return function(**kwargs)
         except Exception as e:
-            raise ValueError(f'❌ {func_name} is error ---> {e}.')
+            raise ValueError(f'❌ {func_name} is error -> {e}.')
 
     @staticmethod
     def register_watch(args: list, name: str = None) -> str:
@@ -486,18 +547,18 @@ class U2Driver:
                 watcher.when(value)
                 value_list.append(value)
             else:
-                log.warning(f'{by}={value} type must between "xpath" and "text".')
+                log.warning(f'❌ {by}={value} type must between "xpath" and "text".')
         if not value_list:
-            raise ValueError(f'Not right element be register!')
+            raise ValueError(f'❌ Not right element be register!')
         else:
-            log.info(f'✅ Register watch: {name}={value_list}')
+            log.info(f'✅ Register watch -> {name}={value_list}.')
             watcher.click()
             return name
 
     def start_watcher(self, args: list = None, name: str = None, time_interval: float = 0.5) -> str:
         name = self.register_watch(name=name, args=args)
         Seldom.driver.watcher.start(time_interval)
-        log.info(f'✅ Start watch: {name}.')
+        log.info(f'✅ Start watch -> {name}.')
         return name
 
     @staticmethod
@@ -508,7 +569,7 @@ class U2Driver:
     @staticmethod
     def remove_watcher(name: str):
         Seldom.driver.watcher.remove(name)
-        log.info(f'✅ Remove watch ：{name}.')
+        log.info(f'✅ Remove watch -> {name}.')
 
 
 u2 = U2Driver()

@@ -24,7 +24,8 @@ from .running.config import Seldom, AppConfig
 from .running.loader_extend import SeldomTestLoader
 from .running.runner import main, TestMainExtend
 from .utils.send_extend import SMTP, DingTalk
-
+from .u2driver import u2
+from .wdadriver import wda_
 from .skip import *
 from .testdata.parameterization import *
 

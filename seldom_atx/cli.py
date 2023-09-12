@@ -61,9 +61,9 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
     rerun = loader("rerun") if loader("rerun") is not None else rerun
     report = loader("report") if loader("report") is not None else report
     timeout = loader("timeout") if loader("timeout") is not None else 10
-    platformName = loader("platformName") if loader("platformName") is not None else None
-    appPackage = loader("appPackage") if loader("appPackage") is not None else None
-    deviceId = loader("deviceId") if loader("deviceId") is not None else None
+    Seldom.platformName = platformName = loader("platformName") if loader("platformName") is not None else None
+    Seldom.appPackage = appPackage = loader("appPackage") if loader("appPackage") is not None else None
+    Seldom.deviceId = deviceId = loader("deviceId") if loader("deviceId") is not None else None
     title = loader("title") if loader("title") is not None else "Seldom Test Report"
     tester = loader("tester") if loader("tester") is not None else "Anonymous"
     description = loader("description") if loader("description") is not None else "Test case execution"
