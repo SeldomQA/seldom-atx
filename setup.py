@@ -30,8 +30,6 @@ setup(
         'requests>=2.22.0',
         'jsonschema>=4.10.0',
         'jmespath>=0.10.0',
-        'pymysql>=1.0.0',
-        'genson==1.2.2',
         'click~=8.1.3',
         'python-dateutil==2.8.2',
         'facebook-wda==1.4.6',
