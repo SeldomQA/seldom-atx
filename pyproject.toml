@@ -46,7 +46,7 @@ tidevice = "0.11.0"
 jinja2 = "3.1.2"
 
 [tool.poetry.scripts]
-seldom = "seldom_atx.cli:main"
+seldom_atx = "seldom_atx.cli:main"
 
 
 [build-system]

@@ -55,6 +55,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        seldom=seldom_atx.cli:main
+        seldom_atx=seldom_atx.cli:main
     '''
 )
