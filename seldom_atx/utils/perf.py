@@ -97,7 +97,7 @@ class TidevicePerf:
     """Only iOS perf driver"""
 
     def __init__(self):
-        self.t = tidevice.Device()
+        self.t = tidevice.Device(udid=(loader("deviceId") if loader("deviceId") is not None else None))
         self.perf = tidevice.Performance(self.t, [DataType.CPU, DataType.MEMORY, DataType.FPS])
         self.mem_list = []
         self.mem_time_list = []
@@ -392,8 +392,6 @@ def start_record(video_path, run_path):
         if Common.record:
             try:
                 if Seldom.platformName == 'iOS':
-                    # while not WDAObj.c:
-                    #     time.sleep(1)
                     with make_screenrecord(output_video_path=video_path):
                         while Common.record:
                             time.sleep(1)
@@ -498,22 +496,22 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                     assert False, f'{Common.CASE_ERROR}'
                 # --------------------------录屏文件分帧--------------------------
                 if MODE in [RunType.DEBUG, RunType.DURATION] and Common.RECORD_ERROR == []:
-                    log.info("✅正在进行录屏分帧")
+                    log.info("✅ 正在进行录屏分帧")
                     Common.extract_frames(video_path, frame_path)
-                    log.info("✅录屏分帧结束")
+                    log.info("✅ 录屏分帧结束")
                 # --------------------------寻找关键帧--------------------------
                 if MODE == RunType.DURATION and Common.RECORD_ERROR == []:
-                    log.info("🌝Start searching for the most similar start frame")
+                    log.info("🌝 Start searching for the most similar start frame")
                     start_frame_path = Common.find_best_frame(start_path, frame_path)
                     start_frame = int(os.path.split(start_frame_path)[1].split('.')[0][-6:])
                     log.info(f"Start frame:[{start_frame}]")
-                    log.info("🌚Start searching for the most similar end frame")
+                    log.info("🌚 Start searching for the most similar end frame")
                     stop_frame_path = Common.find_best_frame(stop_path, frame_path, is_start=False)
                     stop_frame = int(os.path.split(stop_frame_path)[1].split('.')[0][-6:])
                     log.info(f"Stop frame:[{stop_frame}]")
                     # --------------------------计算耗时--------------------------
                     duration = round((stop_frame - start_frame) / AppConfig.FPS, 2)
-                    log.info(f"🌈[{testcase_name}]Func time consume[{duration}]s")
+                    log.info(f"🌈 [{testcase_name}]Func time consume[{duration}]s")
                     duration_list.append(duration)
                     start_frame_list.append(Common.image_to_base64(start_frame_path))
                     stop_frame_list.append(Common.image_to_base64(stop_frame_path))
@@ -560,7 +558,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                 # --------------------------耗时或内存阈值断言--------------------------
                 if MODE == RunType.DURATION:
                     max_duration_res = round(statistics.mean(duration_list), 2)
-                    log.success("🌈Average time consumption of functions[{:.2f}]s".format(max_duration_res))
+                    log.success("🌈 Average time consumption of functions[{:.2f}]s".format(max_duration_res))
                     if max_duration_res > duration_threshold:
                         max_duration_res = f"{run_times}次平均耗时：{max_duration_res}s," \
                                            f"设定阈值：{duration_threshold}s."

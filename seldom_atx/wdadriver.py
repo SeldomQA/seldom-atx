@@ -11,6 +11,7 @@ import tidevice
 from seldom_atx.logging import log
 from seldom_atx.logging.exceptions import NotFindElementError
 from seldom_atx.running.config import Seldom, AppConfig
+from seldom_atx.running.loader_hook import loader
 
 __all__ = ["WDADriver", "WDAElement", "make_screenrecord", "wda_"]
 
@@ -35,7 +36,7 @@ LOCATOR_LIST = {
 class WDAObj:
     c = None  # device
     try:
-        t = tidevice.Device()
+        t = tidevice.Device(udid=(loader("deviceId") if loader("deviceId") is not None else None))
         t.create_inner_connection()
     except Exception:
         pass  # 如果当前设备为Android时，会报找不到设备异常，这里跳过异常
@@ -104,10 +105,10 @@ class WDAElement:
             if not self.desc:
                 self.desc = self.kwargs
             if timeout:
-                wda_.implicitly_wait(timeout)
+                wda_.implicitly_wait(timeout, noLog=True)
             WDAObj.e = WDAObj.s(**self.kwargs, visible=visible, index=index).get()
             if timeout:
-                wda_.implicitly_wait(Seldom.timeout)
+                wda_.implicitly_wait(Seldom.timeout, noLog=True)
         except Exception as e:
             if empty is False:
                 raise NotFindElementError(f"❌ Find element error: {self.desc} ---> {e}")
@@ -362,13 +363,6 @@ class WDADriver:
         Seldom.driver.press(keycodes.get('home'))
         return self
 
-    # def size(self) -> dict:
-    #     """
-    #     return screen resolution.
-    #     """
-    #     size = Seldom.driver.window_size()
-    #     log.info(f"screen resolution: {size}")
-    #     return size
     @staticmethod
     def tap(x: int, y: int) -> None:
         """
@@ -400,7 +394,7 @@ class WDADriver:
 
         swipe_times = 0
         wda_elem = WDAElement(**kwargs)
-        log.info(f'Swipe to find ---> {wda_elem.desc}')
+        log.info(f'Swipe to find ---> {wda_elem.kwargs}')
         while not wda_elem.get_elements(index=index, empty=True, timeout=0.5):
             self.swipe_up(upper=upper)
             swipe_times += 1
@@ -425,8 +419,12 @@ class WDADriver:
 
     @staticmethod
     def func(func_name, **kwargs):
-        function = getattr(Seldom.driver, func_name)
-        return function(**kwargs)
+        try:
+            function = getattr(Seldom.driver, func_name)
+            log.info(f"✅ New func {func_name}({kwargs}).")
+            return function(**kwargs)
+        except Exception as e:
+            raise ValueError(f'❌ {func_name} is error -> {e}.')
 
 
 wda_ = WDADriver()

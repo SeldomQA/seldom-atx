@@ -446,6 +446,53 @@ class U2Driver:
                 time.sleep(1)
 
     @staticmethod
+    def swipe_left(times: int = 1, upper: bool = False, height: float = 0.9, start: float = 0.9,
+                   end: float = 0.1) -> None:
+        """swipe left"""
+        log.info(f"✅ swipe left {times} times.")
+
+        if upper is True:
+            start = (start / 2)
+
+        for _ in range(times):
+            Seldom.driver.swipe(start, height, end, height)
+            if times != 1:
+                time.sleep(1)
+
+    def swipe_left_find(self, times: int = 15, upper: bool = False, height: float = 0.9, index: int = None,
+                        **kwargs) -> None:
+        """
+        向左滑动寻找元素
+
+        Usage:
+        self.swipe_left_find(elem=ElemObj)
+        self.swipe_left_find(text='login')
+        """
+
+        swipe_times = 0
+        u2_elem = U2Element(index=index, **kwargs)
+        log.info(f'✅ {u2_elem.desc} -> swipe to find.')
+        while not self.get_display(**kwargs):
+            self.swipe_left(upper=upper, height=height)
+            swipe_times += 1
+            if swipe_times > times:
+                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {u2_elem.desc}.")
+
+    @staticmethod
+    def swipe_right(times: int = 1, upper: bool = False, height: float = 0.9, start: float = 0.1,
+                    end: float = 0.9) -> None:
+        """swipe right"""
+        log.info(f"✅ swipe right {times} times.")
+
+        if upper is True:
+            end = (end / 2)
+
+        for _ in range(times):
+            Seldom.driver.swipe(start, height, end, height)
+            if times != 1:
+                time.sleep(1)
+
+    @staticmethod
     def swipe_points(start_point: Tuple[float, float], end_point: Tuple[float, float], duration: int = 0.1):
         Seldom.driver.swipe_points([start_point, end_point], duration=duration)
         log.info(f'✅ Swipe from {start_point} to {end_point}.')
