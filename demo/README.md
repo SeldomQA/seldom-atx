@@ -1,6 +1,6 @@
-## seldom demo
+## seldom_atx demo
 
-通过 demo 帮助你快速了解seldom的使用。
+通过 demo 帮助你快速了解seldom_atx的使用。
 
 ### 准备工作
 
@@ -24,35 +24,29 @@
 > pip install -U git+https://github.com/SeldomQA/seldom-atx.git
 ```
 
-* 确保 seldom 命令可用。
 
-```shell
-> seldom --version                 
-seldom, version 3.1.1
-```
 
 ### 使用方法
 
-seldom 从 3.1 开始支持 `confrun.py` 配置运行钩子函数，并推荐你使用这种方式。
+seldom_atx 支持 `confrun.py` 配置运行钩子函数，并推荐你使用这种方式。
 
-| 函数         | 类型      | 说明                                                        |
-|-------------|---------|-----------------------------------------------------------|
-| start_run() | fixture | 运行测试之前执行                                                  |
-| end_run()   | fixture | 运行测试之后执行                                                  |
-| base_url()  | api     | 设置http接口基本url: 例如 http://httpbin.org                      |
-| platformName()  | app     | app的设备类型，例如：Android或iOS                                          |
-| appPackage()  | app     | app的包名，例如：com.android.settings                             |
-| deviceId()  | app     | app的设备ID或UDID，例如：f5ede5e3                             |
-| debug()  | general     | 是否开启debug模式：True/False                                    |
-| rerun()  | general     | 用例失败/错误重跑，默认：0                                            |
-| report()  | general     | 指定报告生成地址，例如： `/User/tech/xxx.html`、  `/User/tech/xxx.xml` |
-| timeout()  | general     | 全局运行超时时间，默认：10                                            |
-| title()  | general     | 测试报告标题：html报告                                             |
-| tester()  | general     | 测试人员名字：html报告                                            |
-| description()  | general     | 测试报告描述：html报告                                       |
-| language()  | general     | 测试报告语言：html报告，类型： `en`、`zh-CN`                     |
-| whitelist()  | general     | 运行用例白名单                                                |
-| blacklist()  | general     | 运行用例黑名单                                                |
+| 函数             | 类型      | 说明                                                        |
+|----------------|---------|-----------------------------------------------------------|
+| start_run()    | fixture | 运行测试之前执行                                                  |
+| end_run()      | fixture | 运行测试之后执行                                                  |
+| platform_name() | app     | app的设备类型，例如：Android或iOS                                   |
+| app_package()   | app     | app的包名，例如：com.android.settings                            |
+| device_id()     | app     | app的设备ID或UDID，例如：f5ede5e3                                 |
+| debug()        | general | 是否开启debug模式：True/False                                    |
+| rerun()        | general | 用例失败/错误重跑，默认：0                                            |
+| report()       | general | 指定报告生成地址，例如： `/User/tech/xxx.html`、  `/User/tech/xxx.xml` |
+| timeout()      | general | 全局运行超时时间，默认：10                                            |
+| title()        | general | 测试报告标题：html报告                                             |
+| tester()       | general | 测试人员名字：html报告                                             |
+| description()  | general | 测试报告描述：html报告                                             |
+| language()     | general | 测试报告语言：html报告，类型： `en`、`zh-CN`                            |
+| whitelist()    | general | 运行用例白名单                                                   |
+| blacklist()    | general | 运行用例黑名单                                                   |
 
 
 __特殊配置__
@@ -64,7 +58,7 @@ __特殊配置__
 ```python
 # confrun.py
 
-def platformName():
+def platform_name():
     """
     app UI test
     between Android and iOS
@@ -72,7 +66,7 @@ def platformName():
     return "Android"
 
 
-def appPackage():
+def app_package():
     """
     app UI test
     test app package name
@@ -80,7 +74,7 @@ def appPackage():
     return "com.android.settings"
 
 
-def deviceId():
+def device_id():
     """
     app UI test
     Android: device id
