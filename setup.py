@@ -5,12 +5,12 @@ from setuptools import setup, find_packages
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
-with open('seldom/__init__.py', 'rb') as f:
+with open('seldom_atx/__init__.py', 'rb') as f:
     version = str(ast.literal_eval(_version_re.search(
         f.read().decode('utf-8')).group(1)))
 
 setup(
-    name='seldom',
+    name='seldom_atx',
     version=version,
     url='https://github.com/SeldomQA/seldom-atx',
     license='Apache-2.0',
@@ -57,6 +57,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        seldom=seldom.cli:main
+        seldom=seldom_atx.cli:main
     '''
 )

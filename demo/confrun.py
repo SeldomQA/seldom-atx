@@ -52,7 +52,7 @@ def title():
     """
     setting report title
     """
-    return "seldom test report"
+    return "seldom_atx test report"
 
 
 def tester():
@@ -86,3 +86,8 @@ def whitelist():
 def blacklist():
     """test label black list"""
     return []
+
+
+def duration_times():
+    """耗时性能测试用例重复次数"""
+    return 3
