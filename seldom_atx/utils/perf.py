@@ -27,12 +27,12 @@ from seldom_atx.wdadriver import wda_, make_screenrecord
 class MySoloX:
     """iOS and Android perf driver, but iOS used not so good"""
 
-    def __init__(self, pkgName, deviceId=None, platform=None):
-        if deviceId is None:
-            deviceId = Seldom.deviceId
+    def __init__(self, pkg_name, device_id=None, platform=None):
+        if device_id is None:
+            device_id = Seldom.device_id
         if platform is None:
-            platform = Seldom.platformName
-        if platform == Seldom.platformName:
+            platform = Seldom.platform_name
+        if platform == Seldom.platform_name:
             wait_times = 0
             while wait_times <= 20:
                 if u2.wait_app() != 0:
@@ -40,9 +40,9 @@ class MySoloX:
                 wait_times += 1
                 log.info(f'Unable to obtain pid,retry...{wait_times}')
                 time.sleep(0.5)
-        self.mem = Memory(pkgName=pkgName, deviceId=deviceId, platform=platform)
-        self.cpu = CPU(pkgName=pkgName, deviceId=deviceId, platform=platform)
-        self.fps = FPS(pkgName=pkgName, deviceId=deviceId, platform=platform)
+        self.mem = Memory(pkgName=pkg_name, deviceId=device_id, platform=platform)
+        self.cpu = CPU(pkgName=pkg_name, deviceId=device_id, platform=platform)
+        self.fps = FPS(pkgName=pkg_name, deviceId=device_id, platform=platform)
 
     def get_mem(self):
         """get mem info"""
@@ -97,7 +97,7 @@ class TidevicePerf:
     """Only iOS perf driver"""
 
     def __init__(self):
-        self.t = tidevice.Device(udid=(loader("deviceId") if loader("deviceId") is not None else None))
+        self.t = tidevice.Device(udid=(loader("device_id") if loader("device_id") is not None else None))
         self.perf = tidevice.Performance(self.t, [DataType.CPU, DataType.MEMORY, DataType.FPS])
         self.mem_list = []
         self.mem_time_list = []
@@ -123,16 +123,16 @@ class TidevicePerf:
                 str(((datetime.fromtimestamp(value['timestamp'] / 1000)).strftime('%H:%M:%S.%f'))[:-3]))
             self.fps_list.append((value['value'], 0))
 
-    def start(self, pkgName=None):
-        if pkgName is None:
-            pkgName = Seldom.appPackage
+    def start(self, pkg_name=None):
+        if pkg_name is None:
+            pkg_name = Seldom.app_package
         self.mem_list = []
         self.mem_time_list = []
         self.cpu_list = []
         self.cpu_time_list = []
         self.fps_list = []
         self.fps_time_list = []
-        self.perf.start(bundle_id=pkgName, callback=self.callback)
+        self.perf.start(bundle_id=pkg_name, callback=self.callback)
 
     def stop(self):
         self.perf.stop()
@@ -341,10 +341,10 @@ def run_testcase(func, *args, **kwargs):
         Common.CASE_ERROR.append(f"{e}")
         log.error(f'Error in run_testcase: {e}')
         raise e
-    if Common.record and Seldom.platformName == 'Android':
+    if Common.record and Seldom.platform_name == 'Android':
         time.sleep(1)
         u2.stop_recording()
-    elif Common.record and Seldom.platformName == 'iOS':
+    elif Common.record and Seldom.platform_name == 'iOS':
         Common.record = False
         if Common.iOS_perf_obj is not None:
             Common.iOS_perf_obj.stop()
@@ -358,7 +358,7 @@ def get_log(log_path, run_path):
         AppConfig.log = True
         while not os.path.exists(run_path):
             time.sleep(1)
-        if Seldom.platformName == 'Android':
+        if Seldom.platform_name == 'Android':
             u2.write_log(log_path)
     except Exception as e:
         Common.LOGS_ERROR.append(f"{e}")
@@ -368,8 +368,8 @@ def get_log(log_path, run_path):
 def get_perf():
     """Obtain mobile device performance data"""
     try:
-        if Seldom.platformName == 'Android':
-            perf = MySoloX(pkgName=Seldom.appPackage, platform=Seldom.platformName)
+        if Seldom.platform_name == 'Android':
+            perf = MySoloX(pkg_name=Seldom.app_package, platform=Seldom.platform_name)
             new_cpu = gevent.spawn(perf.get_cpu)
             new_mem = gevent.spawn(perf.get_mem)
             new_fps = gevent.spawn(perf.get_fps)
@@ -377,7 +377,7 @@ def get_perf():
             cache.set({'CPU_INFO': new_cpu.value})
             cache.set({'MEM_INFO': new_mem.value})
             cache.set({'FPS_INFO': new_fps.value})
-        elif Seldom.platformName == 'iOS':
+        elif Seldom.platform_name == 'iOS':
             Common.iOS_perf_obj = TidevicePerf()
             Common.iOS_perf_obj.start()
     except Exception as e:
@@ -391,11 +391,11 @@ def start_record(video_path, run_path):
     while Common.threadLock and Seldom.driver:
         if Common.record:
             try:
-                if Seldom.platformName == 'iOS':
+                if Seldom.platform_name == 'iOS':
                     with make_screenrecord(output_video_path=video_path):
                         while Common.record:
                             time.sleep(1)
-                elif Seldom.platformName == 'Android':
+                elif Seldom.platform_name == 'Android':
                     u2.start_recording(video_path)
             except Exception as e:
                 Common.RECORD_ERROR.append(f"{e}")
@@ -483,7 +483,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                 Common.record = False
 
                 # --------------------------执行用例--------------------------
-                if get_logs and Seldom.platformName == 'Android':
+                if get_logs and Seldom.platform_name == 'Android':
                     log_thread = threading.Thread(target=get_log, args=(log_path, run_path))
                     log_thread.start()
                 do_list = [gevent.spawn(run_testcase, func, *args, **kwargs),
@@ -516,9 +516,9 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                     start_frame_list.append(Common.image_to_base64(start_frame_path))
                     stop_frame_list.append(Common.image_to_base64(stop_frame_path))
                     if run_times != 1:
-                        if Seldom.platformName == 'Android':
+                        if Seldom.platform_name == 'Android':
                             u2.launch_app(stop=True)
-                        elif Seldom.platformName == 'iOS':
+                        elif Seldom.platform_name == 'iOS':
                             wda_.launch_app(stop=True)
 
                 # --------------------------性能图像保存在本地并转换为base64--------------------
@@ -553,7 +553,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                 file_class_name = f"{testcase_file_name} --> {testcase_class_name}"
                 in_excel_times = AppConfig.STRESS_TIMES if MODE == RunType.STRESS else run_times
                 test_case_data = {'Time': folder_time, 'TestCasePath': file_class_name, 'TestCaseName': testcase_name,
-                                  'TestCaseDesc': testcase_desc, 'Device': Seldom.platformName,
+                                  'TestCaseDesc': testcase_desc, 'Device': Seldom.platform_name,
                                   'Times': in_excel_times, 'MODE': mode}
                 # --------------------------耗时或内存阈值断言--------------------------
                 if MODE == RunType.DURATION:

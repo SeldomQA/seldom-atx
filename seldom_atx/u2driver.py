@@ -110,7 +110,7 @@ class U2Driver:
         """卸载指定应用"""
 
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         Seldom.driver.app_uninstall(package_name)
         log.info(f'✅ {package_name} -> Remove APP.')
 
@@ -119,7 +119,7 @@ class U2Driver:
         """启动指定应用"""
 
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         log.info(f'✅ {package_name} -> Launch APP, STOP={stop}.')
         Seldom.driver.app_start(package_name=package_name, stop=stop)
 
@@ -127,7 +127,7 @@ class U2Driver:
     def close_app(package_name: str = None) -> None:
         """关闭指定应用"""
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         log.info(f'✅ {package_name} -> Close APP.')
         Seldom.driver.app_stop(package_name)
 
@@ -141,7 +141,7 @@ class U2Driver:
     def clear_app(package_name: str = None) -> None:
         """清除APP数据"""
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         Seldom.driver.app_clear(package_name)
         log.info(f'✅ {package_name} -> Clear APP.')
 
@@ -149,7 +149,7 @@ class U2Driver:
     def wait_app(package_name: str = None) -> int:
         """等待APP运行"""
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         log.info(f'✅ {package_name} -> wait APP run.')
         pid = Seldom.driver.app_wait(package_name)
         return pid
@@ -514,7 +514,7 @@ class U2Driver:
         save app icon
         """
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         if not save_path:
             save_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, f'{package_name}.png')
         Seldom.driver.app_icon(package_name).save(save_path)
@@ -524,7 +524,7 @@ class U2Driver:
     @staticmethod
     def app_info(package_name: str = None) -> str:
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         info = Seldom.driver.app_info(package_name)
         log.info(f'✅ {package_name} -> info: {info}.')
         return info

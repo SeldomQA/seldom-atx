@@ -10,9 +10,9 @@ class Seldom:
     driver = None
     timeout = 30
     debug = False
-    platformName = None
-    deviceId = None
-    appPackage = None
+    platform_name = None
+    device_id = None
+    app_package = None
     env = None
 
 

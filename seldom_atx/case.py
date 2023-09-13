@@ -98,7 +98,7 @@ class TestCaseU2(TestCase, U2Driver):
 
     @classmethod
     def setUpClass(cls):
-        Seldom.driver = uiautomator2.connect_usb(Seldom.deviceId)
+        Seldom.driver = uiautomator2.connect_usb(Seldom.device_id)
         cls().start_class()
 
     def assertElement(self, index: int = 0, msg: str = None, **kwargs) -> None:
@@ -138,7 +138,7 @@ class TestCaseWDA(TestCase, WDADriver):
 
     @classmethod
     def setUpClass(cls):
-        Seldom.driver = wda.USBClient(udid=Seldom.deviceId)
+        Seldom.driver = wda.USBClient(udid=Seldom.device_id)
         cls().start_class()
 
     def assertElement(self, index: int = 0, msg: str = None, **kwargs) -> None:

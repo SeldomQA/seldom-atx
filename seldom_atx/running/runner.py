@@ -49,11 +49,11 @@ class TestMain:
             case: str = None,
             debug: bool = False,
             timeout: int = 10,
-            deviceId: str = None,
-            platformName: str = None,
-            appPackage: str = None,
+            device_id: str = None,
+            platform_name: str = None,
+            app_package: str = None,
             report: str = None,
-            title: str = "Seldom Test Report",
+            title: str = "Seldom ATX Test Report",
             tester: str = "Anonymous",
             description: [str or list] = "Test case execution",
             rerun: int = 0,
@@ -71,9 +71,9 @@ class TestMain:
         :param description:
         :param debug:
         :param timeout:
-        :param deviceId:
-        :param platformName:
-        :param appPackage:
+        :param device_id:
+        :param platform_name:
+        :param app_package:
         :param report:
         :param rerun:
         :param language:
@@ -97,12 +97,12 @@ class TestMain:
         self.blacklist = blacklist
         self.open = open
         self.auto = auto
-        Seldom.platformName = platformName
-        Seldom.deviceId = deviceId
-        Seldom.appPackage = appPackage
+        Seldom.platform_name = platform_name
+        Seldom.device_id = device_id
+        Seldom.app_package = app_package
 
-        if Seldom.platformName not in DEVICE_LIST:
-            raise TypeError(f"platformName [{platformName}] must be between iOS and Android.")
+        if Seldom.platform_name not in DEVICE_LIST:
+            raise TypeError(f"platform_name [{app_package}] must be between iOS and Android.")
 
         if isinstance(timeout, int) is False:
             raise TypeError(f"Timeout {timeout} is not integer.")
@@ -207,9 +207,9 @@ class TestMainExtend(TestMain):
             path: str = None,
             debug: bool = False,
             timeout: int = 10,
-            deviceId: str = None,
-            platformName: str = None,
-            appPackage: str = None,
+            device_id: str = None,
+            platform_name: str = None,
+            app_package: str = None,
             report: str = None,
             title: str = "Seldom Test Report",
             tester: str = "Anonymous",
@@ -223,7 +223,7 @@ class TestMainExtend(TestMain):
             raise FileNotFoundError("Specify a file path")
 
         super().__init__(path=path, debug=debug, timeout=timeout,
-                         deviceId=deviceId, platformName=platformName, appPackage=appPackage, report=report,
+                         device_id=device_id, platform_name=platform_name, app_package=app_package, report=report,
                          title=title, tester=tester,
                          description=description, rerun=rerun, language=language,
                          whitelist=whitelist, blacklist=blacklist, open=False, auto=False)

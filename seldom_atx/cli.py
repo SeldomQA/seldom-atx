@@ -61,9 +61,9 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
     rerun = loader("rerun") if loader("rerun") is not None else rerun
     report = loader("report") if loader("report") is not None else report
     timeout = loader("timeout") if loader("timeout") is not None else 10
-    Seldom.platformName = platformName = loader("platformName") if loader("platformName") is not None else None
-    Seldom.appPackage = appPackage = loader("appPackage") if loader("appPackage") is not None else None
-    Seldom.deviceId = deviceId = loader("deviceId") if loader("deviceId") is not None else None
+    Seldom.platform_name = platform_name = loader("platform_name") if loader("platform_name") is not None else None
+    Seldom.app_package = app_package = loader("app_package") if loader("app_package") is not None else None
+    Seldom.device_id = device_id = loader("device_id") if loader("device_id") is not None else None
     title = loader("title") if loader("title") is not None else "Seldom Test Report"
     tester = loader("tester") if loader("tester") is not None else "Anonymous"
     description = loader("description") if loader("description") is not None else "Test case execution"
@@ -113,9 +113,9 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
                 path, case = reset_case(path, case)
                 main_extend = TestMainExtend(
                     path=path, debug=debug, timeout=timeout,
-                    platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
-                    tester=tester,
-                    description=description, rerun=rerun, language=language,
+                    platform_name=platform_name, device_id=device_id, app_package=app_package,
+                    report=report, title=title, tester=tester, description=description,
+                    rerun=rerun, language=language,
                     whitelist=whitelist, blacklist=blacklist)
                 main_extend.run_cases(case)
             loader("end_run")
@@ -124,9 +124,9 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
         loader("start_run")
         seldom_atx.main(
             path=path, debug=debug, timeout=timeout,
-            platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
-            tester=tester,
-            description=description, rerun=rerun, language=language,
+            platform_name=platform_name, device_id=device_id, app_package=app_package,
+            report=report, title=title, tester=tester, description=description,
+            rerun=rerun, language=language,
             whitelist=whitelist, blacklist=blacklist)
         loader("end_run")
         return 0
@@ -137,9 +137,9 @@ def main(project, clear_cache, path, collect, level, case_json, env, debug, reru
         loader("start_run")
         seldom_atx.main(
             case=mod, debug=debug, timeout=timeout,
-            platformName=platformName, deviceId=deviceId, appPackage=appPackage, report=report, title=title,
-            tester=tester,
-            description=description, rerun=rerun, language=language,
+            platform_name=platform_name, device_id=device_id, app_package=app_package,
+            report=report, title=title, tester=tester, description=description,
+            rerun=rerun, language=language,
             whitelist=whitelist, blacklist=blacklist)
         loader("end_run")
         return 0

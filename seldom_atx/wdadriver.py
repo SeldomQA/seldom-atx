@@ -36,7 +36,7 @@ LOCATOR_LIST = {
 class WDAObj:
     c = None  # device
     try:
-        t = tidevice.Device(udid=(loader("deviceId") if loader("deviceId") is not None else None))
+        t = tidevice.Device(udid=(loader("device_id") if loader("device_id") is not None else None))
         t.create_inner_connection()
     except Exception:
         pass  # 如果当前设备为Android时，会报找不到设备异常，这里跳过异常
@@ -150,7 +150,7 @@ class WDADriver:
             app_path: the local or remote path to the application to install
 
         """
-        os.system(f'tidevice --udid {Seldom.deviceId} install {app_path}')
+        os.system(f'tidevice --udid {Seldom.device_id} install {app_path}')
         log.info(f'Install APP path ---> {app_path}')
         return self
 
@@ -162,7 +162,7 @@ class WDADriver:
 
         """
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         os.system(f'tidevice uninstall {package_name}')
         log.info(f'Remove APP ---> {package_name}')
         return self
@@ -170,7 +170,7 @@ class WDADriver:
     def launch_app(self, package_name: str = None, stop: bool = False):
         """Start on the device the application specified in the desired capabilities."""
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         if stop:
             Seldom.driver.session().app_terminate(package_name)
         log.info(f'Launch APP ---> {package_name} STOP={stop}')
@@ -186,7 +186,7 @@ class WDADriver:
             Union['WebDriver', 'Applications']: Self instance
         """
         if not package_name:
-            package_name = Seldom.appPackage
+            package_name = Seldom.app_package
         log.info(f'Close APP ---> {package_name}')
         Seldom.driver.session().app_terminate(package_name)
 

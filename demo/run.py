@@ -1,4 +1,4 @@
-import seldom
+import seldom_atx
 
 """
 说明：
@@ -14,12 +14,11 @@ rerun： 测试失败重跑
 
 if __name__ == '__main__':
     # uiautomator2 case 配置
-
-    seldom.main(path="./test_dir/app_case",
-                deviceId='2bf9b4dc',
-                platformName='Android',
-                appPackage='com.meizu.flyme.flymebbs',
-                title="seldom自带 APP demo",
-                tester="Cobb",
-                debug=True,
-                rerun=0)
+    seldom_atx.main(path="./test_dir/app_case",
+                    device_id='2bf9b4dc',
+                    platform_name='Android',
+                    app_package='com.meizu.flyme.flymebbs',
+                    title="seldom自带 APP demo",
+                    tester="Cobb",
+                    debug=True,
+                    rerun=0)
