@@ -70,8 +70,7 @@ class U2Element:
                 raise NotFindElementError(f"❌ Find error: {self.desc} -> {e}.")
             else:
                 return []
-        if not empty:
-            self.find_elem_info = f"Find element: {self.desc}."
+        self.find_elem_info = f"Find element: {self.desc}."
         return elems
 
     @property

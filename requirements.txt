@@ -5,7 +5,7 @@ facebook-wda==1.4.6
 findit==0.5.9
 gevent==23.7.0
 imageio-ffmpeg==0.4.8
-jmespath==1.0.1
+jmespath==0.10.0
 jsonschema==4.19.0
 matplotlib==3.7.1
 openpyxl==3.2.0b1

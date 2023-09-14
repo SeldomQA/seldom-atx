@@ -36,13 +36,15 @@ LOCATOR_LIST = {
 
 class WDAObj:
     c = None  # device
-    try:
-        t = tidevice.Device(udid=(loader("device_id") if loader("device_id") is not None else None))
-        t.create_inner_connection()
-    except Exception:
-        pass  # 如果当前设备为Android时，会报找不到设备异常，这里跳过异常
     s = None  # session
     e = None  # element
+
+    @staticmethod
+    def t():
+        t = tidevice.Device(udid=(loader("device_id") if loader(
+            "device_id") is not None else Seldom.device_id if Seldom.device_id is not None else None))
+        t.create_inner_connection()
+        return t
 
 
 class SocketBuffer:
@@ -112,10 +114,10 @@ class WDAElement:
                 wda_.implicitly_wait(Seldom.timeout, noLog=True)
         except Exception as e:
             if empty is False:
-                raise NotFindElementError(f"❌ Find element error: {self.desc} ---> {e}")
+                raise NotFindElementError(f"❌ Find element error: {self.desc} -> {e}.")
             else:
                 return []
-        self.find_elem_info = f"Find element: {self.desc}."
+        self.find_elem_info = f"Find element: {self.desc}"
         return WDAObj.e
 
     @property
@@ -263,7 +265,7 @@ class WDADriver:
         """
         wda_elem = WDAElement(**kwargs)
         elem = wda_elem.get_elements(index)
-        text = elem.get_text()
+        text = elem.text
         log.info(f"✅ {wda_elem.info} -> get text: {text}.")
         return text
 
@@ -377,7 +379,7 @@ class WDADriver:
 
     @staticmethod
     def swipe_up(times: int = 1, upper: bool = False, width: float = 0.5, start: float = 0.8,
-                 end: float = 0.1) -> None:
+                 end: float = 0.4) -> None:
         """
         swipe up
         """
@@ -387,7 +389,7 @@ class WDADriver:
             start = (start / 2)
 
         for _ in range(times):
-            Seldom.driver.swipe(width, start, width, end, 0.5)
+            Seldom.driver.swipe(width, start, width, end)
             if times != 1:
                 time.sleep(1)
 
@@ -396,11 +398,12 @@ class WDADriver:
         swipe_times = 0
         wda_elem = WDAElement(**kwargs)
         log.info(f'✅ Swipe to find -> {wda_elem.kwargs}.')
-        while not wda_elem.get_elements(index=index, empty=True, timeout=0.5):
+        while not self.get_display(**kwargs, index=index):
             self.swipe_up(upper=upper)
             swipe_times += 1
+            time.sleep(2)
             if swipe_times > times:
-                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.desc}.")
+                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.kwargs}.")
 
     @staticmethod
     def swipe_down(times: int = 1, upper: bool = False, width: float = 0.5, start: float = 0.1,
@@ -414,7 +417,7 @@ class WDADriver:
             end = (end / 2)
 
         for _ in range(times):
-            Seldom.driver.swipe(width, start, width, end, 0.5)
+            Seldom.driver.swipe(width, start, width, end)
             if times != 1:
                 time.sleep(1)
 
@@ -447,6 +450,7 @@ class WDADriver:
         while not wda_elem.get_elements(index=index, empty=True, timeout=0.5):
             self.swipe_left(upper=upper, height=height)
             swipe_times += 1
+            time.sleep(2)
             if swipe_times > times:
                 raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.desc}.")
 
@@ -485,16 +489,11 @@ wda_ = WDADriver()
 @contextlib.contextmanager
 def make_screenrecord(t=None, output_video_path='record.mp4'):
     """
-    iOS录屏上下文管理器c=None, , fps=AppConfig.FPS
+    iOS录屏上下文管理器
     这里不指定帧率的话，默认只有10帧/s，但指定帧率视频容易变速
     """
-    # if c is None:
-    #     c = WDAObj.c = Seldom.driver
     if t is None:
-        t = WDAObj.t
-    # _old_fps = c.appium_settings()['mjpegServerFramerate']
-    # _fps = fps
-    # c.appium_settings({"mjpegServerFramerate": _fps})
+        t = WDAObj.t()
 
     # Read image from WDA mjpeg server
     pconn = t.create_inner_connection(9100)  # default WDA mjpeg server port
@@ -504,7 +503,7 @@ def make_screenrecord(t=None, output_video_path='record.mp4'):
     buf.read_until(b'\r\n\r\n')
     log.info(f"📷️ start_recording -> ({output_video_path}).")
 
-    wr = imageio.get_writer(output_video_path)  # , fps=_fps
+    wr = imageio.get_writer(output_video_path)
 
     def _drain(stop_event, done_event):
         while not stop_event.is_set():
@@ -531,5 +530,4 @@ def make_screenrecord(t=None, output_video_path='record.mp4'):
     stop_event.set()
     done_event.wait()
     wr.close()
-    # c.appium_settings({"mjpegServerFramerate": _old_fps})
     log.info(f"📷️ Record down.")

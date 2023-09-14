@@ -160,12 +160,11 @@ class TestMain:
             else:
                 os.mkdir(os.path.join(os.getcwd(), "reports"))
 
-            report_folder = AppConfig.PERF_OUTPUT_FOLDER = os.path.join(os.getcwd(), "reports")
-
             if (self.report is None) and (BrowserConfig.REPORT_PATH is not None):
                 report_path = BrowserConfig.REPORT_PATH
             else:
-                report_path = BrowserConfig.REPORT_PATH = os.path.join(report_folder, self.report)
+                report_path = BrowserConfig.REPORT_PATH = os.path.join(os.path.join(os.getcwd(), "reports"),
+                                                                       self.report)
 
             with open(report_path, 'wb') as fp:
                 if report_path.split(".")[-1] == "xml":
@@ -180,7 +179,8 @@ class TestMain:
                     runner.run(suits)
             if AppConfig.WRITE_EXCEL:
                 write_to_excel(data=AppConfig.WRITE_EXCEL,
-                               filename=os.path.join(report_folder, f'{os.path.basename(report_path)[:26]}.xlsx'))
+                               filename=os.path.join(os.path.join(os.getcwd(), "reports"),
+                                                     f'{os.path.basename(report_path)[:26]}.xlsx'))
 
             log.success(f"generated html file: file:///{report_path}")
             log.success(f"generated log file: file:///{BrowserConfig.LOG_PATH}")

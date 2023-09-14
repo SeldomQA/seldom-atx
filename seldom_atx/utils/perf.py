@@ -428,8 +428,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             run_times = 1
             folder_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")  # 以当前时间来命名文件夹
             if AppConfig.PERF_OUTPUT_FOLDER is None:
-                raise ValueError(
-                    '❌ Please do not run in debug mode or specify "AppConfig.PERF_OUTPUT_FOLDER" directory!')
+                AppConfig.PERF_OUTPUT_FOLDER = os.path.join(os.getcwd(), "reports")
             testcase_base_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, testcase_folder_name, testcase_class_name,
                                               testcase_name)
             if not os.path.exists(testcase_base_path):

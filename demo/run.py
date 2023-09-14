@@ -13,11 +13,11 @@ rerun： 测试失败重跑
 """
 
 if __name__ == '__main__':
-    # uiautomator2 case 配置
-    seldom_atx.main(path="./test_dir/app_case",
-                    device_id='2bf9b4dc',
+    # Android case 配置
+    seldom_atx.main(path="./test_dir/app_case/test_demo_Android.py",
+                    device_id='f5ede5e3',
                     platform_name='Android',
-                    app_package='com.meizu.flyme.flymebbs',
+                    app_package='com.android.settings',
                     title="seldom自带 APP demo",
                     tester="Cobb",
                     debug=True,
