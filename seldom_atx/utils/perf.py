@@ -38,7 +38,7 @@ class MySoloX:
                 if u2.wait_app() != 0:
                     break
                 wait_times += 1
-                log.info(f'Unable to obtain pid,retry...{wait_times}')
+                log.info(f'❗ Unable to obtain pid,retry...{wait_times}.')
                 time.sleep(0.5)
         self.mem = Memory(pkgName=pkg_name, deviceId=device_id, platform=platform)
         self.cpu = CPU(pkgName=pkg_name, deviceId=device_id, platform=platform)
@@ -97,7 +97,7 @@ class TidevicePerf:
     """Only iOS perf driver"""
 
     def __init__(self):
-        self.t = tidevice.Device(udid=(loader("device_id") if loader("device_id") is not None else None))
+        self.t = tidevice.Device(udid=(loader("device_id") if loader("deviceId") is not None else None))
         self.perf = tidevice.Performance(self.t, [DataType.CPU, DataType.MEMORY, DataType.FPS])
         self.mem_list = []
         self.mem_time_list = []
@@ -176,7 +176,7 @@ class Common:
         # 打开视频文件
         cap = cv2.VideoCapture(video_file)
         fps = cap.get(cv2.CAP_PROP_FPS)
-        log.info("视频帧率为 {:.2f} 帧/秒".format(fps))
+        log.info("✅ 视频帧率为 {:.2f} fps/s.".format(fps))
 
         # 计算帧数和总时长（以秒为单位）
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -339,8 +339,9 @@ def run_testcase(func, *args, **kwargs):
         func(*args, **kwargs)
     except Exception as e:
         Common.CASE_ERROR.append(f"{e}")
-        log.error(f'Error in run_testcase: {e}')
-        raise e
+        log.error(f'❌ Error in run_testcase: {e}.')
+        if Seldom.platform_name == 'Android':
+            u2.stop_all_watcher()
     if Common.record and Seldom.platform_name == 'Android':
         time.sleep(1)
         u2.stop_recording()
@@ -362,14 +363,14 @@ def get_log(log_path, run_path):
             u2.write_log(log_path)
     except Exception as e:
         Common.LOGS_ERROR.append(f"{e}")
-        log.error(f'Error in get_log: {e}')
+        log.error(f'❌ Error in get_log: {e}.')
 
 
 def get_perf():
     """Obtain mobile device performance data"""
     try:
         if Seldom.platform_name == 'Android':
-            perf = MySoloX(pkg_name=Seldom.app_package, platform=Seldom.platform_name)
+            perf = MySoloX(pkgName=Seldom.app_package, platform=Seldom.platform_name)
             new_cpu = gevent.spawn(perf.get_cpu)
             new_mem = gevent.spawn(perf.get_mem)
             new_fps = gevent.spawn(perf.get_fps)
@@ -382,7 +383,7 @@ def get_perf():
             Common.iOS_perf_obj.start()
     except Exception as e:
         Common.PERF_ERROR.append(f"{e}")
-        log.error(f"Error in get_perf: {e}")
+        log.error(f"❌ Error in get_perf: {e}.")
 
 
 def start_record(video_path, run_path):
@@ -399,7 +400,7 @@ def start_record(video_path, run_path):
                     u2.start_recording(video_path)
             except Exception as e:
                 Common.RECORD_ERROR.append(f"{e}")
-                log.error(f"Error in start_record: {e}")
+                log.error(f"❌ Error in start_record: {e}.")
             break
         time.sleep(1.5)
 
@@ -416,6 +417,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             start_path = None
             stop_path = None
             perf_path = None
+            Common.iOS_perf_obj = None
             testcase_name = func.__name__  # test case name
             testcase_desc = func.__doc__  # test case desc
             testcase_file_name = os.path.split(inspect.getsourcefile(func))[1]  # 获取被装饰函数所在的模块文件路径
@@ -426,7 +428,8 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             run_times = 1
             folder_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")  # 以当前时间来命名文件夹
             if AppConfig.PERF_OUTPUT_FOLDER is None:
-                raise ValueError('Please do not run in debug mode or specify "AppConfig.PERF_OUTPUT_FOLDER" directory!')
+                raise ValueError(
+                    '❌ Please do not run in debug mode or specify "AppConfig.PERF_OUTPUT_FOLDER" directory!')
             testcase_base_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, testcase_folder_name, testcase_class_name,
                                               testcase_name)
             if not os.path.exists(testcase_base_path):
@@ -496,22 +499,22 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                     assert False, f'{Common.CASE_ERROR}'
                 # --------------------------录屏文件分帧--------------------------
                 if MODE in [RunType.DEBUG, RunType.DURATION] and Common.RECORD_ERROR == []:
-                    log.info("✅ 正在进行录屏分帧")
+                    log.info("✅ 正在进行录屏分帧.")
                     Common.extract_frames(video_path, frame_path)
-                    log.info("✅ 录屏分帧结束")
+                    log.info("✅ 录屏分帧结束.")
                 # --------------------------寻找关键帧--------------------------
                 if MODE == RunType.DURATION and Common.RECORD_ERROR == []:
-                    log.info("🌝 Start searching for the most similar start frame")
+                    log.info("🌝 Start searching for the most similar start frame.")
                     start_frame_path = Common.find_best_frame(start_path, frame_path)
                     start_frame = int(os.path.split(start_frame_path)[1].split('.')[0][-6:])
-                    log.info(f"Start frame:[{start_frame}]")
-                    log.info("🌚 Start searching for the most similar end frame")
+                    log.info(f"Start frame:[{start_frame}].")
+                    log.info("🌚 Start searching for the most similar end frame.")
                     stop_frame_path = Common.find_best_frame(stop_path, frame_path, is_start=False)
                     stop_frame = int(os.path.split(stop_frame_path)[1].split('.')[0][-6:])
-                    log.info(f"Stop frame:[{stop_frame}]")
+                    log.info(f"Stop frame:[{stop_frame}].")
                     # --------------------------计算耗时--------------------------
                     duration = round((stop_frame - start_frame) / AppConfig.FPS, 2)
-                    log.info(f"🌈 [{testcase_name}]Func time consume[{duration}]s")
+                    log.info(f"🌈 [{testcase_name}]Func time consume[{duration}]s.")
                     duration_list.append(duration)
                     start_frame_list.append(Common.image_to_base64(start_frame_path))
                     stop_frame_list.append(Common.image_to_base64(stop_frame_path))
@@ -544,7 +547,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                             Common.draw_chart(fps_info[1], fps_info[0], ['fps', 'jank'], jpg_name=fps_image_path,
                                               label_title='Fps'))
             # --------------------------图片回写报告--------------------------
-            if MODE in [RunType.DEBUG, RunType.DURATION, RunType.STRESS] and Common.PERF_ERROR == []:
+            if MODE in [RunType.DURATION, RunType.STRESS] and Common.PERF_ERROR == []:
                 photo_list = cpu_base64_list + mem_base64_list + fps_base64_list + flo_base64_list \
                              + bat_base64_list + start_frame_list + stop_frame_list
                 AppConfig.REPORT_IMAGE.extend(photo_list)
@@ -558,7 +561,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                 # --------------------------耗时或内存阈值断言--------------------------
                 if MODE == RunType.DURATION:
                     max_duration_res = round(statistics.mean(duration_list), 2)
-                    log.success("🌈 Average time consumption of functions[{:.2f}]s".format(max_duration_res))
+                    log.success("🌈 Average time consumption of functions[{:.2f}]s.".format(max_duration_res))
                     if max_duration_res > duration_threshold:
                         max_duration_res = f"{run_times}次平均耗时：{max_duration_res}s," \
                                            f"设定阈值：{duration_threshold}s."

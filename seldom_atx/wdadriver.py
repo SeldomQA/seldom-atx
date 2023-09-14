@@ -6,6 +6,7 @@ import io
 import socket
 import threading
 from datetime import datetime
+from typing import Tuple
 import imageio
 import tidevice
 from seldom_atx.logging import log
@@ -151,7 +152,7 @@ class WDADriver:
 
         """
         os.system(f'tidevice --udid {Seldom.device_id} install {app_path}')
-        log.info(f'Install APP path ---> {app_path}')
+        log.info(f'✅ Install APP path -> {app_path}.')
         return self
 
     def remove_app(self, package_name: str):
@@ -164,7 +165,7 @@ class WDADriver:
         if not package_name:
             package_name = Seldom.app_package
         os.system(f'tidevice uninstall {package_name}')
-        log.info(f'Remove APP ---> {package_name}')
+        log.info(f'✅ Remove APP -> {package_name}.')
         return self
 
     def launch_app(self, package_name: str = None, stop: bool = False):
@@ -173,7 +174,7 @@ class WDADriver:
             package_name = Seldom.app_package
         if stop:
             Seldom.driver.session().app_terminate(package_name)
-        log.info(f'Launch APP ---> {package_name} STOP={stop}')
+        log.info(f'✅ Launch APP -> {package_name} STOP={stop}.')
         WDAObj.s = Seldom.driver.session(package_name)
 
         return self
@@ -187,7 +188,7 @@ class WDADriver:
         """
         if not package_name:
             package_name = Seldom.app_package
-        log.info(f'Close APP ---> {package_name}')
+        log.info(f'✅ Close APP -> {package_name}.')
         Seldom.driver.session().app_terminate(package_name)
 
         return self
@@ -270,7 +271,7 @@ class WDADriver:
     def get_display(index: int = 0, **kwargs) -> bool:
         """获取当前某元素的可见状态"""
         wda_elem = WDAElement(**kwargs)
-        result = WDAObj.s(**kwargs, visible=True, index=index).exists
+        result = WDAObj.s(**wda_elem.kwargs, visible=True, index=index).exists
         log.info(f"✅ {wda_elem.kwargs} -> exists: {result}.")
         return result
 
@@ -287,7 +288,7 @@ class WDADriver:
             result = True
         except Exception:
             if noLog is not True:
-                log.info(f"❌ Element {wda_elem.kwargs} not exist")
+                log.info(f"❌ Element {wda_elem.kwargs} not exist.")
                 self.save_screenshot(report=True)
             result = False
         Seldom.timeout = timeout_backups
@@ -346,20 +347,20 @@ class WDADriver:
         :param key: keyword name
         press_key("HOME")
         """
-        log.info(f'press key "{key}"')
+        log.info(f'✅ press key "{key}".')
         keycode = keycodes.get(key)
         Seldom.driver.press(keycode)
         return self
 
     def back(self):
         """go back"""
-        log.info("go back")
+        log.info("✅ go back.")
         Seldom.driver.press(keycodes.get('back'))
         return self
 
     def home(self):
         """press home"""
-        log.info("press home")
+        log.info("✅ press home.")
         Seldom.driver.press(keycodes.get('home'))
         return self
 
@@ -371,7 +372,7 @@ class WDADriver:
         :param y: y coordinates
         :return:
         """
-        log.info(f"tap x={x},y={y}.")
+        log.info(f"✅ tap x={x},y={y}.")
         Seldom.driver.click(x=x, y=y)
 
     @staticmethod
@@ -380,7 +381,7 @@ class WDADriver:
         """
         swipe up
         """
-        log.info(f"swipe up {times} times")
+        log.info(f"✅ Swipe up {times} times.")
 
         if upper is True:
             start = (start / 2)
@@ -394,12 +395,12 @@ class WDADriver:
 
         swipe_times = 0
         wda_elem = WDAElement(**kwargs)
-        log.info(f'Swipe to find ---> {wda_elem.kwargs}')
+        log.info(f'✅ Swipe to find -> {wda_elem.kwargs}.')
         while not wda_elem.get_elements(index=index, empty=True, timeout=0.5):
             self.swipe_up(upper=upper)
             swipe_times += 1
             if swipe_times > times:
-                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find ---> {wda_elem.desc}")
+                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.desc}.")
 
     @staticmethod
     def swipe_down(times: int = 1, upper: bool = False, width: float = 0.5, start: float = 0.1,
@@ -407,7 +408,7 @@ class WDADriver:
         """
         swipe down
         """
-        log.info(f"swipe down {times} times")
+        log.info(f"✅ Swipe down {times} times.")
 
         if upper is True:
             end = (end / 2)
@@ -416,6 +417,57 @@ class WDADriver:
             Seldom.driver.swipe(width, start, width, end, 0.5)
             if times != 1:
                 time.sleep(1)
+
+    @staticmethod
+    def swipe_left(times: int = 1, upper: bool = False, height: float = 0.9, start: float = 0.9,
+                   end: float = 0.1) -> None:
+        """swipe left"""
+        log.info(f"✅ swipe left {times} times.")
+
+        if upper is True:
+            start = (start / 2)
+
+        for _ in range(times):
+            Seldom.driver.swipe(start, height, end, height)
+            if times != 1:
+                time.sleep(1)
+
+    def swipe_left_find(self, times: int = 15, upper: bool = False, height: float = 0.9, index: int = None,
+                        **kwargs) -> None:
+        """
+        向左滑动寻找元素
+
+        Usage:
+        self.swipe_left_find(text='login')
+        """
+
+        swipe_times = 0
+        wda_elem = WDAElement(index=index, **kwargs)
+        log.info(f'✅ {wda_elem.kwargs} -> swipe to find.')
+        while not wda_elem.get_elements(index=index, empty=True, timeout=0.5):
+            self.swipe_left(upper=upper, height=height)
+            swipe_times += 1
+            if swipe_times > times:
+                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.desc}.")
+
+    @staticmethod
+    def swipe_right(times: int = 1, upper: bool = False, height: float = 0.9, start: float = 0.1,
+                    end: float = 0.9) -> None:
+        """swipe right"""
+        log.info(f"✅ Swipe right {times} times.")
+
+        if upper is True:
+            end = (end / 2)
+
+        for _ in range(times):
+            Seldom.driver.swipe(start, height, end, height)
+            if times != 1:
+                time.sleep(1)
+
+    @staticmethod
+    def swipe_points(start_point: Tuple[float, float], end_point: Tuple[float, float], duration: int = 0.1):
+        WDAObj.s.swipe(*start_point, *end_point, duration=duration)
+        log.info(f'✅ Swipe from {start_point} to {end_point}.')
 
     @staticmethod
     def func(func_name, **kwargs):
@@ -431,17 +483,18 @@ wda_ = WDADriver()
 
 
 @contextlib.contextmanager
-def make_screenrecord(c=None, t=None, output_video_path='record.mp4', fps=AppConfig.FPS):
+def make_screenrecord(t=None, output_video_path='record.mp4'):
     """
-    iOS录屏上下文管理器
+    iOS录屏上下文管理器c=None, , fps=AppConfig.FPS
+    这里不指定帧率的话，默认只有10帧/s，但指定帧率视频容易变速
     """
-    if c is None:
-        c = WDAObj.c = Seldom.driver
+    # if c is None:
+    #     c = WDAObj.c = Seldom.driver
     if t is None:
         t = WDAObj.t
-    _old_fps = c.appium_settings()['mjpegServerFramerate']
-    _fps = fps
-    c.appium_settings({"mjpegServerFramerate": _fps})
+    # _old_fps = c.appium_settings()['mjpegServerFramerate']
+    # _fps = fps
+    # c.appium_settings({"mjpegServerFramerate": _fps})
 
     # Read image from WDA mjpeg server
     pconn = t.create_inner_connection(9100)  # default WDA mjpeg server port
@@ -451,7 +504,7 @@ def make_screenrecord(c=None, t=None, output_video_path='record.mp4', fps=AppCon
     buf.read_until(b'\r\n\r\n')
     log.info(f"📷️ start_recording -> ({output_video_path}).")
 
-    wr = imageio.get_writer(output_video_path, fps=_fps)
+    wr = imageio.get_writer(output_video_path)  # , fps=_fps
 
     def _drain(stop_event, done_event):
         while not stop_event.is_set():
@@ -478,5 +531,5 @@ def make_screenrecord(c=None, t=None, output_video_path='record.mp4', fps=AppCon
     stop_event.set()
     done_event.wait()
     wr.close()
-    c.appium_settings({"mjpegServerFramerate": _old_fps})
-    log.info(f"📷️ record down.")
+    # c.appium_settings({"mjpegServerFramerate": _old_fps})
+    log.info(f"📷️ Record down.")
