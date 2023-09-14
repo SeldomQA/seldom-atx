@@ -226,7 +226,7 @@ class U2Driver:
             return False
         else:
             result = elem.exists
-            log.info(f"✅ {u2_elem.info} -> display: {result}.")
+            log.info(f"✅ {u2_elem.kwargs} -> display: {result}.")
             return result
 
     def wait(self, timeout: int = Seldom.timeout, index: int = None, noLog: bool = False, **kwargs) -> bool:
@@ -418,13 +418,13 @@ class U2Driver:
         向上滑动寻找元素
 
         Usage:
-        self.swipe_up_find_u2(elem=ElemObj)
-        self.swipe_up_find_u2(text='login')
+        self.swipe_up_find(elem=ElemObj)
+        self.swipe_up_find(text='login')
         """
 
         swipe_times = 0
         u2_elem = U2Element(index=index, **kwargs)
-        log.info(f'✅ {u2_elem.desc} -> swipe to find.')
+        log.info(f'✅ {u2_elem.kwargs} -> swipe to find.')
         while not self.get_display(**kwargs):
             self.swipe_up(upper=upper)
             swipe_times += 1
@@ -465,13 +465,12 @@ class U2Driver:
         向左滑动寻找元素
 
         Usage:
-        self.swipe_left_find(elem=ElemObj)
         self.swipe_left_find(text='login')
         """
 
         swipe_times = 0
         u2_elem = U2Element(index=index, **kwargs)
-        log.info(f'✅ {u2_elem.desc} -> swipe to find.')
+        log.info(f'✅ {u2_elem.kwargs} -> swipe to find.')
         while not self.get_display(**kwargs):
             self.swipe_left(upper=upper, height=height)
             swipe_times += 1
