@@ -107,11 +107,7 @@ class WDAElement:
         try:
             if not self.desc:
                 self.desc = self.kwargs
-            if timeout:
-                wda_.implicitly_wait(timeout, noLog=True)
-            WDAObj.e = WDAObj.s(**self.kwargs, visible=visible, index=index).get()
-            if timeout:
-                wda_.implicitly_wait(Seldom.timeout, noLog=True)
+            WDAObj.e = WDAObj.s(**self.kwargs, visible=visible, index=index).get(timeout=timeout)
         except Exception as e:
             if empty is False:
                 raise NotFindElementError(f"❌ Find element error: {self.desc} -> {e}.")
@@ -277,38 +273,36 @@ class WDADriver:
         log.info(f"✅ {wda_elem.kwargs} -> exists: {result}.")
         return result
 
-    def wait(self, timeout: float = 5, index: int = 0, noLog=False, **kwargs) -> bool:
+    def wait(self, timeout: int = 5, index: int = 0, noLog=False, **kwargs) -> bool:
         """等待某元素出现"""
         wda_elem = WDAElement(**kwargs)
-
-        timeout_backups = Seldom.timeout
-        Seldom.timeout = timeout
-        if noLog is not True:
+        result = None
+        if noLog is False:
             log.info(f"⌛ wait {wda_elem.kwargs} to exist: {timeout}s.")
-        try:
-            WDAObj.s(**kwargs, visible=True, index=index).wait(timeout=timeout)
-            result = True
-        except Exception:
-            if noLog is not True:
-                log.info(f"❌ Element {wda_elem.kwargs} not exist.")
-                self.save_screenshot(report=True)
-            result = False
-        Seldom.timeout = timeout_backups
+        for _ in range(timeout):
+            result = self.get_display(**wda_elem.kwargs, index=index, noLog=True)
+            time.sleep(1)
+            if result:
+                break
+        if not result:
+            if noLog is False:
+                log.warning(f"❗ Element {wda_elem.kwargs} not exist.")
+            self.save_screenshot(report=True)
         return result
 
     def wait_gone(self, timeout: int = None, index: int = 0, **kwargs) -> bool:
-        """
-        等待元素消失
-
-        """
+        """等待元素消失"""
         if not timeout:
             timeout = Seldom.timeout
         wda_elem = WDAElement(**kwargs)
         log.info(f"⌛ wait {wda_elem.kwargs} gone: timeout={timeout}s.")
-        result = WDAObj.s(**kwargs, visible=True, index=index).wait_gone(timeout=timeout)
+        try:
+            result = WDAObj.s(**kwargs, visible=True, index=index).wait_gone(timeout=timeout)
+        except Exception as e:
+            raise e
 
         if not result:
-            log.warning(f'⌛ wait {wda_elem.kwargs} gone failed.')
+            log.warning(f'❗ Wait {wda_elem.kwargs} gone failed.')
             self.save_screenshot(report=True)
         return result
 
@@ -401,7 +395,7 @@ class WDADriver:
         while not self.get_display(**kwargs, index=index):
             self.swipe_up(upper=upper)
             swipe_times += 1
-            time.sleep(2)
+            time.sleep(3.5)
             if swipe_times > times:
                 raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.kwargs}.")
 
@@ -423,7 +417,7 @@ class WDADriver:
 
     @staticmethod
     def swipe_left(times: int = 1, upper: bool = False, height: float = 0.9, start: float = 0.9,
-                   end: float = 0.1) -> None:
+                   end: float = 0.4) -> None:
         """swipe left"""
         log.info(f"✅ swipe left {times} times.")
 
@@ -450,12 +444,12 @@ class WDADriver:
         while not wda_elem.get_elements(index=index, empty=True, timeout=0.5):
             self.swipe_left(upper=upper, height=height)
             swipe_times += 1
-            time.sleep(2)
+            time.sleep(3.5)
             if swipe_times > times:
                 raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.desc}.")
 
     @staticmethod
-    def swipe_right(times: int = 1, upper: bool = False, height: float = 0.9, start: float = 0.1,
+    def swipe_right(times: int = 1, upper: bool = False, height: float = 0.9, start: float = 0.4,
                     end: float = 0.9) -> None:
         """swipe right"""
         log.info(f"✅ Swipe right {times} times.")

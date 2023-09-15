@@ -370,7 +370,7 @@ def get_perf():
     """Obtain mobile device performance data"""
     try:
         if Seldom.platform_name == 'Android':
-            perf = MySoloX(pkgName=Seldom.app_package, platform=Seldom.platform_name)
+            perf = MySoloX(pkg_name=Seldom.app_package, platform=Seldom.platform_name)
             new_cpu = gevent.spawn(perf.get_cpu)
             new_mem = gevent.spawn(perf.get_mem)
             new_fps = gevent.spawn(perf.get_fps)
