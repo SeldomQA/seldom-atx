@@ -43,14 +43,14 @@ class U2Element:
             raise ValueError(f"No supported elements found.")
         self.find_elem_info = None
         self.find_elem_warn = None
+        if self.desc:
+            self.desc = f'desc={self.desc}'
+        else:
+            self.desc = ', '.join([f"{k}={v}" for k, v in self.kwargs.items()])
 
     def get_elements(self, index: int = None, empty: bool = False, timeout: float = None):
         """获取元素"""
         try:
-            if self.desc:
-                self.desc = f'desc={self.desc}'
-            else:
-                self.desc = ', '.join([f"{k}={v}" for k, v in self.kwargs.items()])
             if timeout:
                 u2.implicitly_wait(timeout=timeout, noLog=True)
             if index:
@@ -225,7 +225,7 @@ class U2Driver:
             return False
         else:
             result = elem.exists
-            log.info(f"✅ {u2_elem.kwargs} -> display: {result}.")
+            log.info(f"✅ {u2_elem.desc} -> display: {result}.")
             return result
 
     def wait(self, timeout: int = Seldom.timeout, index: int = None, noLog: bool = False, **kwargs) -> bool:
@@ -423,7 +423,7 @@ class U2Driver:
 
         swipe_times = 0
         u2_elem = U2Element(index=index, **kwargs)
-        log.info(f'✅ {u2_elem.kwargs} -> swipe to find.')
+        log.info(f'✅ {u2_elem.desc} -> swipe to find.')
         while not self.get_display(**kwargs):
             self.swipe_up(upper=upper)
             swipe_times += 1
@@ -469,7 +469,7 @@ class U2Driver:
 
         swipe_times = 0
         u2_elem = U2Element(index=index, **kwargs)
-        log.info(f'✅ {u2_elem.kwargs} -> swipe to find.')
+        log.info(f'✅ {u2_elem.desc} -> swipe to find.')
         while not self.get_display(**kwargs):
             self.swipe_left(upper=upper, height=height)
             swipe_times += 1

@@ -225,7 +225,7 @@ class Common:
         cap.release()
 
     @staticmethod
-    def calculate_hash(image, hash_size=128):
+    def calculate_hash(image, hash_size=256):
         """Calculate the hash value of the input image"""
         # 将图像调整为指定大小，并转换为灰度图像
         image = cv2.resize(image, (hash_size, hash_size))
@@ -257,9 +257,10 @@ class Common:
         best_match = None
         best_distance = float('inf')
         if len(frame_path_list) <= int(AppConfig.FRAME_SECONDS * AppConfig.FPS) * 2:
-            start_frame_num = len(frame_path_list) / 2
+            start_frame_num = len(frame_path_list) if is_start is True else 0
         else:
             start_frame_num = AppConfig.FRAME_SECONDS * AppConfig.FPS
+        end_list = []
         for i, filename in enumerate(frame_path_list):
             if is_start and i < start_frame_num:
                 if filename.endswith('.jpg'):
@@ -270,7 +271,7 @@ class Common:
                     # 计算当前图像和参考图像的哈希距离
                     distance = sum([a != b for a, b in zip(hash, reference_hash)])
                     # 更新最相似的图像
-                    if distance <= best_distance:
+                    if distance <= best_distance or abs(best_distance - distance) < 100:
                         best_match = path
                         best_distance = distance
 
@@ -286,7 +287,13 @@ class Common:
                     if distance < best_distance:
                         best_match = path
                         best_distance = distance
-
+                        end_list.append({'best_match': path, 'best_distance': distance})
+        if not is_start:
+            best_match_list = []
+            for end in end_list:
+                if abs(best_distance - end['best_distance']) < 100:
+                    best_match_list.append(end['best_match'])
+            best_match = best_match_list[0]
         # 输出最相似的图像路径
         return best_match
 
@@ -331,6 +338,10 @@ def start_recording():
     """Start screen recording identification"""
     Common.record = True
     time.sleep(2)
+
+
+def stop_recording():
+    Common.record = False
 
 
 def run_testcase(func, *args, **kwargs):

@@ -10,12 +10,17 @@ class TestDemo(TestCaseWDA):
     Test iOS Demo
     """
 
+    def start(self):
+        self.launch_app(stop=True)
+
+    def end(self):
+        self.close_app()
+
     @AppPerf(MODE=RunType.DEBUG)
     def test_demo(self):
         """
         test iOS settings
         """
-        self.launch_app()
         start_recording()
         self.swipe_up_find(name='General')
         self.click(name='General')

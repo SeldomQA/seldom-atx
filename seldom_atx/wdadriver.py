@@ -102,11 +102,13 @@ class WDAElement:
             raise ValueError(f"No supported elements found.")
         self.find_elem_info = None
         self.find_elem_warn = None
+        if self.desc:
+            self.desc = f'desc={self.desc}'
+        else:
+            self.desc = ', '.join([f"{k}={v}" for k, v in self.kwargs.items()])
 
     def get_elements(self, index: int = 0, visible: bool = True, empty: bool = False, timeout: float = None):
         try:
-            if not self.desc:
-                self.desc = self.kwargs
             WDAObj.e = WDAObj.s(**self.kwargs, visible=visible, index=index).get(timeout=timeout)
         except Exception as e:
             if empty is False:
@@ -270,7 +272,7 @@ class WDADriver:
         """获取当前某元素的可见状态"""
         wda_elem = WDAElement(**kwargs)
         result = WDAObj.s(**wda_elem.kwargs, visible=True, index=index).exists
-        log.info(f"✅ {wda_elem.kwargs} -> exists: {result}.")
+        log.info(f"✅ {wda_elem.desc} -> exists: {result}.")
         return result
 
     def wait(self, timeout: int = 5, index: int = 0, noLog=False, **kwargs) -> bool:
@@ -278,7 +280,7 @@ class WDADriver:
         wda_elem = WDAElement(**kwargs)
         result = None
         if noLog is False:
-            log.info(f"⌛ wait {wda_elem.kwargs} to exist: {timeout}s.")
+            log.info(f"⌛ wait {wda_elem.desc} to exist: {timeout}s.")
         for _ in range(timeout):
             result = self.get_display(**wda_elem.kwargs, index=index, noLog=True)
             time.sleep(1)
@@ -295,14 +297,14 @@ class WDADriver:
         if not timeout:
             timeout = Seldom.timeout
         wda_elem = WDAElement(**kwargs)
-        log.info(f"⌛ wait {wda_elem.kwargs} gone: timeout={timeout}s.")
+        log.info(f"⌛ wait {wda_elem.desc} gone: timeout={timeout}s.")
         try:
             result = WDAObj.s(**kwargs, visible=True, index=index).wait_gone(timeout=timeout)
         except Exception as e:
             raise e
 
         if not result:
-            log.warning(f'❗ Wait {wda_elem.kwargs} gone failed.')
+            log.warning(f'❗ Wait {wda_elem.desc} gone failed.')
             self.save_screenshot(report=True)
         return result
 
@@ -391,13 +393,13 @@ class WDADriver:
 
         swipe_times = 0
         wda_elem = WDAElement(**kwargs)
-        log.info(f'✅ Swipe to find -> {wda_elem.kwargs}.')
+        log.info(f'✅ Swipe to find -> {wda_elem.desc}.')
         while not self.get_display(**kwargs, index=index):
             self.swipe_up(upper=upper)
             swipe_times += 1
             time.sleep(3.5)
             if swipe_times > times:
-                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.kwargs}.")
+                raise NotFindElementError(f"❌ Find element error: swipe {times} times no find -> {wda_elem.desc}.")
 
     @staticmethod
     def swipe_down(times: int = 1, upper: bool = False, width: float = 0.5, start: float = 0.1,
@@ -440,7 +442,7 @@ class WDADriver:
 
         swipe_times = 0
         wda_elem = WDAElement(index=index, **kwargs)
-        log.info(f'✅ {wda_elem.kwargs} -> swipe to find.')
+        log.info(f'✅ {wda_elem.desc} -> swipe to find.')
         while not wda_elem.get_elements(index=index, empty=True, timeout=0.5):
             self.swipe_left(upper=upper, height=height)
             swipe_times += 1

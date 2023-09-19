@@ -13,12 +13,14 @@ class TestDemo(TestCaseU2):
     def start(self):
         self.launch_app(stop=True)
 
+    def end(self):
+        self.close_app()
+
     @AppPerf(MODE=RunType.DEBUG)
     def test_demo(self):
         """
         test MIUI settings
         """
-        self.launch_app()
         start_recording()
         self.click(resourceId="android:id/title", text="蓝牙")
         self.click(resourceId="com.android.settings:id/refresh_anim")
