@@ -424,13 +424,13 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
         @wraps(func)
         def wrapper(*args, **kwargs):
             # --------------------------初始化--------------------------
-            frame_path = None
-            start_path = None
+            frame_path = None  # 分帧文件夹路径
+            start_path = None  # 开始关键帧路径
             stop_path = None
-            perf_path = None
+            perf_path = None  # 性能文件夹路径
             Common.iOS_perf_obj = None
-            testcase_name = func.__name__  # test case name
-            testcase_desc = func.__doc__  # test case desc
+            testcase_name = func.__name__
+            testcase_desc = func.__doc__
             testcase_file_name = os.path.split(inspect.getsourcefile(func))[1]  # 获取被装饰函数所在的模块文件路径
             testcase_class_name = args[0].__class__.__name__  # 获取被装饰函数所在的类名
             testcase_folder_name = os.path.basename(os.path.dirname(os.path.abspath(func.__code__.co_filename)))
@@ -451,8 +451,12 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             elif MODE == RunType.DURATION:
                 log.info(f'Calculation time consumption mode:{testcase_name}')
                 run_times = duration_times if duration_times is not None else AppConfig.DURATION_TIMES
-                start_path = os.path.join(testcase_base_path, 'start.jpg')  # 开始帧的位置
-                stop_path = os.path.join(testcase_base_path, 'stop.jpg')  # 结束帧的位置
+                keyframes_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, f'{Seldom.platform_name}KeyFrames')
+                if not os.path.exists(keyframes_path):
+                    os.makedirs(keyframes_path)
+                log.info('Please ensure that there are no testcase with the same name!')
+                start_path = os.path.join(keyframes_path, f'{testcase_name}_start.jpg')  # 开始帧的位置
+                stop_path = os.path.join(keyframes_path, f'{testcase_name}_stop.jpg')  # 结束帧的位置
                 if not os.path.exists(start_path) or not os.path.exists(stop_path):
                     log.error(
                         f'如果是首次运行用例：{testcase_name}\n'
@@ -482,11 +486,11 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                 Common.PERF_ERROR = []
                 Common.LOGS_ERROR = []
                 if MODE in [RunType.DEBUG, RunType.DURATION]:
-                    frame_path = os.path.join(testcase_base_path, folder_time, f'{testcase_name}_frame_{i}')  # 分帧
+                    frame_path = os.path.join(testcase_base_path, folder_time, f'{testcase_name}_frame_{i}')
                     if not os.path.exists(frame_path):
                         os.makedirs(frame_path)
                 if MODE in [RunType.DURATION, RunType.STRESS]:
-                    perf_path = os.path.join(testcase_base_path, folder_time, f'{testcase_name}_jpg_{i}')  # 性能图表
+                    perf_path = os.path.join(testcase_base_path, folder_time, f'{testcase_name}_jpg_{i}')
                     if not os.path.exists(perf_path):
                         os.makedirs(perf_path)
                 else:
