@@ -17,10 +17,10 @@ from seldom_atx.running.loader_hook import loader
 __all__ = ["WDADriver", "WDAElement", "make_screenrecord", "wda_"]
 
 keycodes = {
-    'HOME': 'home',
-    'BACK': 'back',
-    'LEFT': 'left',
-    'ENTER': 'enter',
+    'home': 'home',
+    'back': 'back',
+    'left': 'left',
+    'enter': 'enter',
 }
 
 LOCATOR_LIST = {

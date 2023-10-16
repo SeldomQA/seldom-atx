@@ -11,10 +11,10 @@ from seldom_atx.logging.exceptions import NotFindElementError
 __all__ = ["U2Driver", "U2Element", "u2"]
 
 keycodes = {
-    'HOME': 'home',
-    'BACK': 'back',
-    'LEFT': 'left',
-    'ENTER': 'enter',
+    'home': 'home',
+    'back': 'back',
+    'left': 'left',
+    'enter': 'enter',
 }
 
 LOCATOR_LIST = {
@@ -582,6 +582,10 @@ class U2Driver:
             name = get_word()
         watcher = Seldom.driver.watcher(name)
         value_list = []
+        press = None
+        if isinstance(args[-1], str):
+            press = args[-1]
+            args.pop()
         for elem in args:
             ele = U2Element(**elem)
             by, value = list(ele.kwargs.items())[0]
@@ -596,15 +600,17 @@ class U2Driver:
         if not value_list:
             raise ValueError(f'❌ Not right element be register!')
         else:
-            log.info(f'✅ Register watch -> {name}={value_list}.')
-            watcher.click()
+            log.info(f'✅ Register watch -> {name}={value_list},Press={press}.')
+            if press:
+                watcher.press(press)
+            else:
+                watcher.click()
             return name
 
-    def start_watcher(self, args: list = None, name: str = None, time_interval: float = 0.5) -> str:
-        name = self.register_watch(name=name, args=args)
+    @staticmethod
+    def start_watcher(time_interval: float = 0.5):
         Seldom.driver.watcher.start(time_interval)
-        log.info(f'✅ Start watch -> {name}.')
-        return name
+        log.info(f'✅ Start watch.')
 
     @staticmethod
     def stop_all_watcher():

@@ -15,15 +15,20 @@
 ├── test_data   # 测试数据
 └── test_dir    # 测试用例
     ├── __init__.py
-    └── app_case  # app UI 自动化用例
+    └── test_demo_Android.py  # app Android 自动化用例
+    └── test_demo_iOS.py  # app iOS 自动化用例
 ```
 
-* 请安装 seldom 最新版本。
+
+* 请安装 seldom_atx 最新版本。
 
 ```shell
-> pip install -U git+https://github.com/SeldomQA/seldom-atx.git
+> pip install -U git+https://techgit.meitu.com/airbrush_autotest/seldom-atx.git
 ```
-
+* 可以通过初始化命令生成一个demo实例：
+```shell
+> seldom_atx --project demoName
+```
 
 
 ### 使用方法

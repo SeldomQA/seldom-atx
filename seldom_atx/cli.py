@@ -175,49 +175,115 @@ def create_scaffold(project_name: str) -> None:
 }
 
 '''
-    test_web_sample = '''import seldom_atx
-from seldom_atx import file_data
+    test_demo_Android = '''import seldom_atx
+from seldom_atx.utils import AppPerf, RunType, start_recording
+from seldom_atx import TestCaseU2
+from seldom_atx import label
 
 
-class SampleTest(seldom_atx.TestCase):
+@label('Android')
+class TestDemo(TestCaseU2):
+    """
+    Test Android Demo
+    """
 
-    def test_case(self):
-        """a simple test case """
-        self.open("http://www.itest.info")
-        self.assertInUrl("itest.info")
+    def start(self):
+        self.launch_app(stop=True)
 
+    def end(self):
+        self.close_app()
 
-class DDTTest(seldom_atx.TestCase):
-
-    @file_data(file="data.json", key="bing")
-    def test_data_driver(self, _, keyword):
-        """ data driver case """
-        self.open("https://cn.bing.com")
-        self.type(id_="sb_form_q", text=keyword, enter=True)
-        self.assertInTitle(keyword)
+    @AppPerf(MODE=RunType.DEBUG)
+    def test_demo(self):
+        """
+        test MIUI settings
+        """
+        start_recording()
+        self.click(resourceId="android:id/title", text="蓝牙")
+        self.click(resourceId="com.android.settings:id/refresh_anim")
+        self.assertElement(resourceId="android:id/title", text="蓝牙设置")
+        self.sleep(1)
 
 
 if __name__ == '__main__':
-    seldom_atx.main(debug=True)
-
+    # Android 用例配置
+    seldom_atx.main(
+        device_id="f5ede5e3",
+        app_package="com.android.settings",
+        platform_name="Android",
+        debug=True)
 '''
+    test_demo_iOS = '''import seldom_atx
+from seldom_atx.utils import AppPerf, RunType, start_recording
+from seldom_atx import TestCaseWDA
+from seldom_atx import label
 
+
+@label('iOS')
+class TestDemo(TestCaseWDA):
+    """
+    Test iOS Demo
+    """
+
+    def start(self):
+        self.launch_app(stop=True)
+
+    def end(self):
+        self.close_app()
+
+    @AppPerf(MODE=RunType.DEBUG)
+    def test_demo(self):
+        """
+        test iOS settings
+        """
+        start_recording()
+        self.swipe_up_find(name='General')
+        self.click(name='General')
+        self.click(name='About')
+        self.get_text(className='XCUIElementTypeStaticText', index=3)
+        self.assertElement(name='NAME_CELL_ID')
+        self.sleep(1)
+
+
+if __name__ == '__main__':
+    # iOS 用例配置
+    seldom_atx.main(
+        device_id="bfaaa7b76fe378fb64332ebab762bb36dc77d3c3",
+        app_package="com.apple.Preferences",
+        platform_name="iOS",
+        debug=True)
+    '''
     run_test = '''"""
 seldom_atx confrun.py hooks function
 """
 
-def debug():
+
+def start_run():
+    """
+    Test the hook function before running
+    """
+    ...
+
+
+def end_run():
+    """
+    Test the hook function after running
+    """
+    ...
+
+
+def debug() -> bool:
     """
     debug mod
     """
     return False
 
 
-def rerun():
+def rerun() -> int:
     """
     error/failure rerun times
     """
-    return 0
+    return 1
 
 
 def report():
@@ -230,60 +296,106 @@ def report():
     return None
 
 
-def timeout():
+def timeout() -> int:
     """
     setting timeout
     """
-    return 10
+    return 120
 
 
-def title():
+def title() -> str:
     """
     setting report title
     """
     return "seldom_atx test report"
 
 
-def tester():
+def tester() -> str:
     """
     setting report tester
     """
-    return "bugmaster"
+    return "Cobb"
 
 
 def description():
     """
     setting report description
     """
-    return ["windows", "jenkins"]
+    return ["windows", "Android"]
 
 
-def language():
+def language() -> str:
     """
     setting report language
     return "en"
     return "zh-CN"
     """
-    return "en"
+    return "zh-CN"
 
 
-def whitelist():
+def whitelist() -> list:
     """test label white list"""
     return []
 
 
-def blacklist():
+def blacklist() -> list:
     """test label black list"""
     return []
+
+
+def duration_times() -> int:
+    """耗时性能测试用例重复次数"""
+    return 3
+
+
+def platform_name() -> str:
+    """
+    app UI test
+    between Android and iOS
+    """
+    # return "iOS"
+    return "Android"
+
+
+def app_package() -> str:
+    """
+    app UI test
+    test app package name
+    """
+    # return "com.apple.Preferences"
+    return "com.android.settings"
+
+
+def device_id() -> str:
+    """
+    app UI test
+    Android: device id
+    iOS: udid
+    """
+    # return "bfaaa7b76fe378fb64332ebab762bb36dc77d3c3"
+    return "f5ede5e3"
+
+
+if __name__ == '__main__':
+    print('seldom_atx --path case/iOS/')
+    print('seldom_atx --path case/Android/')
+
 '''
+    requirements = '''solox==2.7.5
+git+https://techgit.meitu.com/airbrush_autotest/seldom-atx.git
+uiautomator2[image]==2.16.23
+'''
+
     create_folder(project_name)
     create_folder(os.path.join(project_name, "test_dir"))
     create_folder(os.path.join(project_name, "reports"))
     create_folder(os.path.join(project_name, "test_data"))
     create_file(os.path.join(project_name, "test_data", "data.json"), test_data)
     create_file(os.path.join(project_name, "test_dir", "__init__.py"))
-    create_file(os.path.join(project_name, "test_dir", "test_web_sample.py"), test_web_sample)
+    create_file(os.path.join(project_name, "test_dir", "test_demo_Android.py"), test_demo_Android)
+    create_file(os.path.join(project_name, "test_dir", "test_demo_iOS.py"), test_demo_iOS)
     create_file(os.path.join(project_name, "confrun.py"), run_test)
+    create_file(os.path.join(project_name, "requirements.txt"), requirements)
 
 
 def reset_case(path: str, cases: list) -> [str, list]:

@@ -1,5 +1,5 @@
 """
-seldom confrun.py hooks function
+seldom_atx confrun.py hooks function
 """
 
 
@@ -17,18 +17,18 @@ def end_run():
     ...
 
 
-def debug():
+def debug() -> bool:
     """
     debug mod
     """
     return False
 
 
-def rerun():
+def rerun() -> int:
     """
     error/failure rerun times
     """
-    return 0
+    return 1
 
 
 def report():
@@ -41,25 +41,25 @@ def report():
     return None
 
 
-def timeout():
+def timeout() -> int:
     """
     setting timeout
     """
-    return 10
+    return 120
 
 
-def title():
+def title() -> str:
     """
     setting report title
     """
     return "seldom_atx test report"
 
 
-def tester():
+def tester() -> str:
     """
     setting report tester
     """
-    return "bugmaster"
+    return "Cobb"
 
 
 def description():
@@ -69,25 +69,53 @@ def description():
     return ["windows", "jenkins"]
 
 
-def language():
+def language() -> str:
     """
     setting report language
     return "en"
     return "zh-CN"
     """
-    return "en"
+    return "zh-CN"
 
 
-def whitelist():
+def whitelist() -> list:
     """test label white list"""
-    return []
+    return ['init']
 
 
-def blacklist():
+def blacklist() -> list:
     """test label black list"""
     return []
 
 
-def duration_times():
+def duration_times() -> int:
     """耗时性能测试用例重复次数"""
     return 3
+
+
+def platform_name() -> str:
+    """
+    app UI test
+    between Android and iOS
+    """
+    # return "iOS"
+    return "Android"
+
+
+def app_package() -> str:
+    """
+    app UI test
+    test app package name
+    """
+    # return "com.apple.Preferences"
+    return "com.android.settings"
+
+
+def device_id() -> str:
+    """
+    app UI test
+    Android: device id
+    iOS: udid
+    """
+    # return "bfaaa7b76fe378fb64332ebab762bb36dc77d3c3"
+    return "f5ede5e3"

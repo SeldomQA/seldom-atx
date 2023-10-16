@@ -351,8 +351,6 @@ def run_testcase(func, *args, **kwargs):
     except Exception as e:
         Common.CASE_ERROR.append(f"{e}")
         log.error(f'❌ Error in run_testcase: {e}.')
-        if Seldom.platform_name == 'Android':
-            u2.stop_all_watcher()
     if Common.record and Seldom.platform_name == 'Android':
         time.sleep(1)
         u2.stop_recording()
@@ -437,13 +435,15 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             cache.set({'TESTCASE_NAME': testcase_name})
             cache.set({'TESTCASE_CLASS_NAME': testcase_class_name})
             run_times = 1
-            folder_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")  # 以当前时间来命名文件夹
             if AppConfig.PERF_OUTPUT_FOLDER is None:
                 AppConfig.PERF_OUTPUT_FOLDER = os.path.join(os.getcwd(), "reports")
-            testcase_base_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, testcase_folder_name, testcase_class_name,
-                                              testcase_name)
+            testcase_base_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, testcase_folder_name, AppConfig.RUN_TIME,
+                                              testcase_class_name, testcase_name)
             if not os.path.exists(testcase_base_path):
                 os.makedirs(testcase_base_path)
+            keyframes_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, f'{Seldom.platform_name}KeyFrames')
+            if not os.path.exists(keyframes_path):
+                os.makedirs(keyframes_path)
             if MODE == RunType.NOTHING:
                 log.info(f'Do nothing mode:{testcase_name}')
             elif MODE == RunType.DEBUG:
@@ -451,9 +451,6 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             elif MODE == RunType.DURATION:
                 log.info(f'Calculation time consumption mode:{testcase_name}')
                 run_times = duration_times if duration_times is not None else AppConfig.DURATION_TIMES
-                keyframes_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, f'{Seldom.platform_name}KeyFrames')
-                if not os.path.exists(keyframes_path):
-                    os.makedirs(keyframes_path)
                 log.info('Please ensure that there are no testcase with the same name!')
                 start_path = os.path.join(keyframes_path, f'{testcase_name}_start.jpg')  # 开始帧的位置
                 stop_path = os.path.join(keyframes_path, f'{testcase_name}_stop.jpg')  # 结束帧的位置
@@ -479,18 +476,18 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
             stop_frame_list = []
             testcase_assert = True
             for i in range(run_times):
-                run_path = AppConfig.PERF_RUN_FOLDER = os.path.join(testcase_base_path, folder_time)
+                run_path = AppConfig.PERF_RUN_FOLDER = testcase_base_path
                 video_path = os.path.join(run_path, f'{testcase_name}_{i}.mp4')  # 录屏文件路径
                 log_path = os.path.join(run_path, f'{testcase_name}_{i}.txt')
                 Common.CASE_ERROR = []
                 Common.PERF_ERROR = []
                 Common.LOGS_ERROR = []
                 if MODE in [RunType.DEBUG, RunType.DURATION]:
-                    frame_path = os.path.join(testcase_base_path, folder_time, f'{testcase_name}_frame_{i}')
+                    frame_path = os.path.join(testcase_base_path, f'{testcase_name}_frame_{i}')
                     if not os.path.exists(frame_path):
                         os.makedirs(frame_path)
                 if MODE in [RunType.DURATION, RunType.STRESS]:
-                    perf_path = os.path.join(testcase_base_path, folder_time, f'{testcase_name}_jpg_{i}')
+                    perf_path = os.path.join(testcase_base_path, f'{testcase_name}_jpg_{i}')
                     if not os.path.exists(perf_path):
                         os.makedirs(perf_path)
                 else:
@@ -569,7 +566,7 @@ def AppPerf(MODE, duration_times: int = None, mem_threshold: int = 800,
                 mode = 'DurationTest' if MODE == RunType.DURATION else 'StressTest'
                 file_class_name = f"{testcase_file_name} --> {testcase_class_name}"
                 in_excel_times = AppConfig.STRESS_TIMES if MODE == RunType.STRESS else run_times
-                test_case_data = {'Time': folder_time, 'TestCasePath': file_class_name, 'TestCaseName': testcase_name,
+                test_case_data = {'Time': AppConfig.RUN_TIME, 'TestCasePath': file_class_name, 'TestCaseName': testcase_name,
                                   'TestCaseDesc': testcase_desc, 'Device': Seldom.platform_name,
                                   'Times': in_excel_times, 'MODE': mode}
                 # --------------------------耗时或内存阈值断言--------------------------

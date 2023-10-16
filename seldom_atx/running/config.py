@@ -35,6 +35,7 @@ class AppConfig:
     """
     Define run atx config
     """
+    RUN_TIME = None
     PERF_OUTPUT_FOLDER = None
     PERF_RUN_FOLDER = None
     REPORT_IMAGE = []

@@ -165,6 +165,8 @@ class TestMain:
             else:
                 report_path = BrowserConfig.REPORT_PATH = os.path.join(os.path.join(os.getcwd(), "reports"),
                                                                        self.report)
+            if AppConfig.RUN_TIME is None:
+                AppConfig.RUN_TIME = os.path.basename(report_path)[:19]
 
             with open(report_path, 'wb') as fp:
                 if report_path.split(".")[-1] == "xml":

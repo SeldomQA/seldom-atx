@@ -14,7 +14,7 @@ rerun： 测试失败重跑
 
 if __name__ == '__main__':
     # Android case 配置
-    seldom_atx.main(path="./test_dir/app_case/test_demo_Android.py",
+    seldom_atx.main(path="test_dir/test_demo_Android.py",
                     device_id='f5ede5e3',
                     platform_name='Android',
                     app_package='com.android.settings',
