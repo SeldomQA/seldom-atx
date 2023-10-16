@@ -1,6 +1,6 @@
-## seldom_atx demo
+## seldom-atx demo
 
-通过 demo 帮助你快速了解seldom_atx的使用。
+通过 demo 帮助你快速了解seldom-atx的使用。
 
 ### 准备工作
 
@@ -20,10 +20,10 @@
 ```
 
 
-* 请安装 seldom_atx 最新版本。
+* 请安装 seldom-atx 最新版本。
 
 ```shell
-> pip install -U git+https://techgit.meitu.com/airbrush_autotest/seldom-atx.git
+> pip install -U git+https://github.com/SeldomQA/seldom-atx.git
 ```
 * 可以通过初始化命令生成一个demo实例：
 ```shell
@@ -96,7 +96,7 @@ def duration_times():
 运行测试：
 
 ```shell
-> seldom --path test_dir/app_case/
+> seldom_atx --path test_dir/
 ```
 
 __通用配置__

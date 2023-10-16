@@ -374,15 +374,9 @@ def device_id() -> str:
     """
     # return "bfaaa7b76fe378fb64332ebab762bb36dc77d3c3"
     return "f5ede5e3"
-
-
-if __name__ == '__main__':
-    print('seldom_atx --path case/iOS/')
-    print('seldom_atx --path case/Android/')
-
 '''
     requirements = '''solox==2.7.5
-git+https://techgit.meitu.com/airbrush_autotest/seldom-atx.git
+git+https://github.com/SeldomQA/seldom-atx.git
 uiautomator2[image]==2.16.23
 '''
 
