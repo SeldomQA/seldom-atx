@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 from matplotlib import dates as mdates
 from dateutil import parser
 from tidevice._perf import DataType
-from solox.public.apm import Memory, CPU, FPS
+from seldom_atx.utils.solox.apm import Memory, CPU, FPS
 from seldom_atx.utils import cache
 from seldom_atx.logging import log
 from seldom_atx.running.config import Seldom, AppConfig
@@ -25,7 +25,7 @@ from seldom_atx.wdadriver import wda_, make_screenrecord
 
 
 class MySoloX:
-    """iOS and Android perf driver, but iOS used not so good"""
+    """Only Android perf driver"""
 
     def __init__(self, pkg_name, device_id=None, platform=None):
         if device_id is None:
@@ -50,7 +50,7 @@ class MySoloX:
         time_list = []
         try:
             while Common.threadLock:
-                mem_res = self.mem.getProcessMem(noLog=True)
+                mem_res = self.mem.getAndroidMemory()
                 now_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
                 log.trace(f'{now_time} : MEM{mem_res}')
                 mem_list.append(tuple(mem_res))
@@ -66,7 +66,7 @@ class MySoloX:
         time_list = []
         try:
             while Common.threadLock:
-                cpu_res = self.cpu.getCpuRate(noLog=True)
+                cpu_res = self.cpu.getAndroidCpuRate()
                 now_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
                 log.trace(f'{now_time} : CPU{cpu_res}')
                 cpu_list.append(tuple(cpu_res))
@@ -82,7 +82,7 @@ class MySoloX:
         time_list = []
         try:
             while Common.threadLock:
-                fps_res = self.fps.getFPS(noLog=True)
+                fps_res = self.fps.getAndroidFps()
                 now_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
                 log.trace(f'{now_time} : FPS{fps_res}')
                 fps_list.append(tuple(fps_res))

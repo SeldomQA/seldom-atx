@@ -4,6 +4,7 @@ seldom_atx main
 import os
 import re
 import ast
+import time
 import json as sys_json
 import inspect
 import unittest
@@ -189,6 +190,8 @@ class TestMain:
             if self.open is True:
                 webbrowser.open_new(f"file:///{report_path}")
         else:
+            if AppConfig.RUN_TIME is None:
+                AppConfig.RUN_TIME = str(int(time.time()))
             runner = DebugTestRunner(
                 blacklist=self.blacklist,
                 whitelist=self.whitelist,
