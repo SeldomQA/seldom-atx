@@ -2,6 +2,9 @@
 
 通过 demo 帮助你快速了解seldom-atx的使用。
 
+### 注意：
+    由于uiautomator2中minicap只支持到Android11，故本框架也目前只支持到Android11
+
 ### 准备工作
 
 * 目录树：
