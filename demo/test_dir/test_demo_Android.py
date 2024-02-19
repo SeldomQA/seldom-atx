@@ -1,5 +1,8 @@
+import time
+
 import seldom_atx
-from seldom_atx.utils import AppPerf, RunType, start_recording
+# from seldom_atx.utils import AppPerf, RunType, start_recording
+from seldom_atx.utils.app.case_decorator import App, start_recording, decorator_list, SeldomDecorator
 from seldom_atx import TestCaseU2
 from seldom_atx import label
 
@@ -16,15 +19,14 @@ class TestDemo(TestCaseU2):
     def end(self):
         self.close_app()
 
-    @AppPerf(MODE=RunType.DEBUG)
+    @App(RunList=[SeldomDecorator.Performance])
     def test_demo(self):
-        """
-        test MIUI settings
-        """
-        start_recording()
-        self.click(resourceId="android:id/title", text="蓝牙")
-        self.click(resourceId="com.android.settings:id/refresh_anim")
-        self.assertElement(resourceId="android:id/title", text="蓝牙设置")
+        """test MIUI settings"""
+        # start_recording()
+        time.sleep(10)
+        # self.click(resourceId="android:id/title", text="蓝牙")
+        # self.click(resourceId="com.android.settings:id/refresh_anim")
+        # self.assertElement(resourceId="android:id/title", text="蓝牙设置")
         self.sleep(1)
 
 

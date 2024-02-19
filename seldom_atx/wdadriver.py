@@ -309,7 +309,7 @@ class WDADriver:
         return result
 
     @staticmethod
-    def save_screenshot(file_path: str = None, report: bool = False) -> None:
+    def save_screenshot(file_path: str = None, report: bool = False) -> str:
         """Saves a screenshots of the current window to a PNG image file."""
         screenshot = Seldom.driver.screenshot()
         if file_path is None:
@@ -324,6 +324,7 @@ class WDADriver:
                 base64_data = base64.b64encode(image_bytes)
                 base64_string = base64_data.decode("utf-8")
             AppConfig.REPORT_IMAGE.extend([base64_string])
+        return file_path
 
     @staticmethod
     def get_element(index: int = 0, **kwargs):

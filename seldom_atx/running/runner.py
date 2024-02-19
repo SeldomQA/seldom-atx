@@ -180,10 +180,10 @@ class TestMain:
                                             rerun=self.rerun, logger=log_cfg,
                                             language=self.language, blacklist=self.blacklist, whitelist=self.whitelist)
                     runner.run(suits)
-            if AppConfig.WRITE_EXCEL:
-                write_to_excel(data=AppConfig.WRITE_EXCEL,
-                               filename=os.path.join(os.path.join(os.getcwd(), "reports"),
-                                                     f'{os.path.basename(report_path)[:26]}.xlsx'))
+            # if AppConfig.WRITE_EXCEL:
+            #     write_to_excel(data=AppConfig.WRITE_EXCEL,
+            #                    filename=os.path.join(os.path.join(os.getcwd(), "reports"),
+            #                                          f'{os.path.basename(report_path)[:26]}.xlsx'))
 
             log.success(f"generated html file: file:///{report_path}")
             log.success(f"generated log file: file:///{BrowserConfig.LOG_PATH}")

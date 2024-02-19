@@ -7,7 +7,7 @@ import ssl
 import json
 import click
 import seldom_atx
-from seldom_atx import Seldom, AppConfig
+from seldom_atx import Seldom, AppConfig, DataBase
 from seldom_atx import SeldomTestLoader
 from seldom_atx import TestMainExtend
 from seldom_atx.logging import log, log_cfg
@@ -165,6 +165,42 @@ def create_scaffold(project_name: str) -> None:
             py_file.write(file_content)
         msg = f"created file: {path}"
         log.info(msg)
+
+    def create_table(db_object, table_name: str):
+        table_attr = get_table_attribute(table_name)
+        if not table_attr:
+            raise ValueError(f"未找到 '{table_name}' 的表定义")
+        fields_definitions = ["id INTEGER PRIMARY KEY AUTOINCREMENT"]
+        fields_definitions += [f"{field_name} {field_type}" for field_name, field_type in table_attr.items()]
+        fields_sql = ", ".join(fields_definitions)
+        sql = f"CREATE TABLE IF NOT EXISTS {table_name} ({fields_sql});"
+        db_object.execute_sql(sql)
+        log.info(f"创建数据表：{table_name}")
+
+    def get_table_attribute(table_name: str):
+        tables_attr = {
+
+            DataBase.ELE_TABLE: {DataBase.ELE_NAME: DataBase.TYPE_TEXT,
+                                 DataBase.ELE_BY: DataBase.TYPE_TEXT,
+                                 DataBase.ELE_VALUE: DataBase.TYPE_TEXT,
+                                 DataBase.ELE_PAGE: DataBase.TYPE_TEXT},
+            DataBase.CONFIG_TABLE: {DataBase.CONFIG_KEY: DataBase.TYPE_TEXT,
+                                    DataBase.CONFIG_VALUE: DataBase.TYPE_TEXT},
+            DataBase.PERF_TABLE: {DataBase.PERF_Device: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_DeviceName: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_TestCasePath: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_TestCaseName: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_TestCaseDesc: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_RunList: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_MemoryMax: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_DurationTimes: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_DurationList: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_DurationAvg: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_TIME: DataBase.TYPE_TEXT,
+                                  DataBase.PERF_RESULT: DataBase.TYPE_TEXT}
+        }
+
+        return tables_attr.get(table_name)
 
     test_data = '''{
  "bing":  [
@@ -390,6 +426,15 @@ uiautomator2[image]==2.16.23
     create_file(os.path.join(project_name, "test_dir", "test_demo_iOS.py"), test_demo_iOS)
     create_file(os.path.join(project_name, "confrun.py"), run_test)
     create_file(os.path.join(project_name, "requirements.txt"), requirements)
+
+    db_dir_path = os.path.join(project_name, "database")
+    create_folder(db_dir_path)
+    from seldom_atx.utils.sqlite import SQLiteDB
+    db_file_path = os.path.join(db_dir_path, DataBase.DB_NAME)
+    db = SQLiteDB(db_path=db_file_path)
+    create_table(db, DataBase.CONFIG_TABLE)
+    create_table(db, DataBase.ELE_TABLE)
+    create_table(db, DataBase.PERF_TABLE)
 
 
 def reset_case(path: str, cases: list) -> [str, list]:

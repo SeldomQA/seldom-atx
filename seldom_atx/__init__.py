@@ -20,10 +20,11 @@ from gevent import monkey  # 引入协程的monkey库
 
 monkey.patch_all()  # 统一修改全局协程等待的耗时为协程的耗时
 from .case import TestCaseU2, TestCaseWDA
-from .running.config import Seldom, AppConfig
+from .running.config import Seldom, AppConfig, DataBase
 from .running.loader_extend import SeldomTestLoader
 from .running.runner import main, TestMainExtend
 from .utils.send_extend import SMTP, DingTalk
+from .utils.sqlite import SQLiteDB
 from .u2driver import u2
 from .wdadriver import wda_
 from .skip import *

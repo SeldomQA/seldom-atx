@@ -5,7 +5,7 @@ from typing import Tuple
 from datetime import datetime
 from seldom_atx.logging import log
 from seldom_atx.testdata import get_word
-from seldom_atx.running.config import Seldom, AppConfig
+from seldom_atx.running.config import Seldom, AppConfig, AppDecorator
 from seldom_atx.logging.exceptions import NotFindElementError
 
 __all__ = ["U2Driver", "U2Element", "u2"]
@@ -325,9 +325,9 @@ class U2Driver:
                     log_list.append(line.decode('utf-8'))
                 except Exception as e:
                     log.error(f'❗ Error in read log: {e}, but skip!')
-                if not AppConfig.log:
+                if not AppDecorator.log:
                     break
-            if not AppConfig.log:
+            if not AppDecorator.log:
                 cmd.close()
             with open(save_path, "w") as f:
                 for item in log_list:
@@ -514,7 +514,7 @@ class U2Driver:
         if not package_name:
             package_name = Seldom.app_package
         if not save_path:
-            save_path = os.path.join(AppConfig.PERF_OUTPUT_FOLDER, f'{package_name}.png')
+            save_path = os.path.join(AppConfig.PERF_RUN_FOLDER, f'{package_name}.png')
         Seldom.driver.app_icon(package_name).save(save_path)
         log.info(f'✅ Icon saved: {save_path}.')
         return save_path
